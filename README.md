@@ -10,7 +10,8 @@ SlideMotion là một skill cho Claude Code (và các agent đọc được SKIL
 |---|---|
 | `SKILL.md` | Tinh thần, quy trình (chọn chế độ, ý tưởng lớn, kịch bản đạo diễn, dựng, tự soát, bàn giao) |
 | `modes/` | Ba chế độ: `giang-day` (dạy lý thuyết), `bao-cao` (trình bày kết quả), `su-kien` (ra mắt, pitch) |
-| `scenes/canh-mau.html` | 13 cảnh dùng lại: bản đồ buổi học, khung kiến thức, câu hỏi kiểm tra, chỉ số có nguồn, biểu đồ một thông điệp, bảng khuyến nghị, toàn cảnh lia, cửa sổ chat, terminal |
+| `scenes/cong-thuc.md` | 13 công thức cơ chế (bấm từng bước, câu hỏi kiểm tra, toàn cảnh lia, vật xuyên suốt, đo chữ để khoanh, bản phát tay...), cố ý không có bố cục để AI không chép |
+| `tests/kiem-thu-runtime.html` | Tệp kiểm thử runtime, không dùng làm mẫu thiết kế |
 | `styles/` | `INDEX.md` để chọn style, mỗi style một thẻ gợi ý (màu, chữ, ngôn ngữ minh họa, chữ ký chuyển động, khoảnh khắc đáng nhớ) |
 | `motion/tu-dien.md` | Động từ của ý, hiệu ứng HTML tương ứng, hiệu ứng PowerPoint tương ứng |
 | `runtime/deck.js` | Co khung 16:9, điều hướng, `data-anim`, `data-loop`, `data-step`, `data-morph`, `data-count`, toàn cảnh lia (`data-cam`, `data-parallax`), in bản phát tay (Ctrl+P) |
@@ -24,7 +25,7 @@ Chép thư mục repo vào `~/.claude/skills/slidemotion`, rồi nói: "làm sli
 
 - [x] Giai đoạn 1: runtime, SKILL.md, từ điển chuyển động, 5 thẻ style thử, 2 deck mẫu
 - [x] Giai đoạn 2: đủ 85 thẻ style
-- [x] Ba chế độ: giảng dạy, báo cáo, sự kiện; cảnh mẫu; in bản phát tay
+- [x] Ba chế độ: giảng dạy, báo cáo, sự kiện; công thức cơ chế; in bản phát tay
 - [ ] Giai đoạn 3: xuất PowerPoint giữ hiệu ứng tương ứng
 - [ ] Giai đoạn 4: GIF demo, trang giới thiệu
 

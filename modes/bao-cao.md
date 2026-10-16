@@ -17,7 +17,7 @@ Không cần thế giới điện ảnh. Cần một sợi chỉ ba nhịp:
 - Con số lớn dùng `data-count` khi muốn nhấn, nhưng không lạm dụng.
 - Bảng: tối đa 6 dòng trên một slide; nhiều hơn thì chuyển sang phụ lục.
 
-Cảnh mẫu trong `scenes/canh-mau.html`: "Chỉ số có nguồn", "Biểu đồ cột một thông điệp", "Bảng so sánh có khuyến nghị".
+Cơ chế trong `scenes/cong-thuc.md`: mục 4 "Con số có nguồn", mục 5 "Biểu đồ một thông điệp". Hình dáng biểu đồ, bảng do bạn thiết kế theo style.
 
 ## Style và hiệu ứng
 - Ưu tiên style sáng, rõ: `swiss-modern`, `blue-professional`, `bento-light`, `dataviz`, `cobalt-grid`, `monochrome`, `signal`. Style sự kiện chỉ dùng cho bìa nếu muốn.

@@ -11,7 +11,7 @@ Dùng khi người dùng đứng lớp: dạy lý thuyết, đào tạo nội b�
 1. **Gọi tên và định nghĩa**: một câu, chữ to. Thuật ngữ giữ nguyên, nghĩa nằm trong câu.
 2. **Ví von đời thường**: "Skill giống bộ tài liệu cho nhân viên mới".
 3. **Ví dụ trong nghề của học viên**: cảnh có đồ vật thật (tin Zalo, bảng Excel, biên bản).
-4. **Câu hỏi kiểm tra**: hỏi trước, bấm mới hiện đáp án (`data-step`). Xem cảnh "Câu hỏi kiểm tra" trong `scenes/canh-mau.html`.
+4. **Câu hỏi kiểm tra**: hỏi trước, bấm mới hiện đáp án (`data-step`). Cơ chế ở mục 2 của `scenes/cong-thuc.md`; hình thức câu hỏi tự thiết kế theo câu chuyện.
 
 Học viên quen nhịp này sau hai khái niệm, từ đó họ tự đoán được slide tiếp theo sẽ làm gì và tập trung vào nội dung.
 

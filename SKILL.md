@@ -17,8 +17,9 @@ styles/<slug>.md      thẻ style: hình dung, màu, chữ, minh họa, chữ k�
 motion/tu-dien.md     từ điển chuyển động: ý của câu -> hiệu ứng HTML -> hiệu ứng PowerPoint tương ứng
 runtime/deck.js       co khung 16:9, điều hướng, data-anim, data-loop, data-step, data-morph, data-count
 runtime/khoi-dau.html bộ khung trống tối thiểu (chỉ là vỏ, không có bố cục)
-scenes/canh-mau.html  cảnh dùng lại được: khung kiến thức, câu hỏi kiểm tra, biểu đồ có nguồn, cửa sổ chat, terminal, toàn cảnh lia
-examples/             deck mẫu để tham khảo độ chịu chơi, không để chép
+scenes/cong-thuc.md   công thức cơ chế (bấm từng bước, câu hỏi kiểm tra, toàn cảnh lia, vật xuyên suốt...), không có bố cục
+examples/             deck mẫu để thấy mức chịu chơi, không để chép; không mở deck trùng chủ đề với deck đang làm
+tests/                tệp kiểm thử runtime, không dùng làm mẫu thiết kế
 ```
 
 ## 1. Luật không đổi (độ tin cậy, chỉ có bấy nhiêu)
@@ -74,7 +75,7 @@ Rồi lập bảng ngắn, mỗi slide một dòng:
 
 ### Bước 4. Dựng
 - Bắt đầu từ `runtime/khoi-dau.html`. Sân khấu 1920x1080, đặt phần tử bằng `position:absolute` theo px hoặc grid/flex tự do, tùy slide.
-- Cần cảnh quen thuộc (câu hỏi kiểm tra, biểu đồ có nguồn, cửa sổ chat, terminal, toàn cảnh lia) thì mở `scenes/canh-mau.html`, chép cảnh rồi biến tấu theo style. Đó là đồ vật để dựng cảnh, không phải khung bố cục.
+- Cần cơ chế khó (câu hỏi kiểm tra, toàn cảnh lia, vật xuyên suốt, đo chữ để khoanh, bản phát tay) thì tra `scenes/cong-thuc.md`, **chỉ sau khi kịch bản đạo diễn đã xong**. Công thức không có bố cục; hình dáng slide do kịch bản và style quyết định.
 - Toàn cảnh lia (`su-kien`, có thể dùng cho `giang-day`): đặt các lớp nền ngoài slide với `data-parallax="0.3"` (xa) đến `"1"` (gần), mỗi slide ghi `data-cam="<px>"`; runtime tự trượt các lớp.
 - Khai báo token màu, chữ của style trong `:root` hoặc `.sm-stage`. CSS riêng từng slide gắn với lớp riêng của slide đó.
 - Minh họa vẽ bằng SVG inline theo ngôn ngữ minh họa của thẻ style. Vẽ đúng vật của nội dung, không vẽ hình trang trí vô nghĩa.
@@ -93,6 +94,7 @@ Mở bằng trình duyệt của app, đi qua **từng** slide, chờ hiệu ứ
 | Ba slide liền có giống dáng nhau? | đổi bố cục một slide |
 | Số có nguồn? | ghi nguồn hoặc bỏ số |
 | Có lỗi console? | sửa |
+| Slide nào giống y một slide trong `examples/` về bố cục và hình? | đổi lại cho hợp câu chuyện của deck này |
 
 Sửa tới khi qua hết. Không giao khi chưa tự xem.
 
