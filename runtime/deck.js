@@ -139,7 +139,9 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
     stage.dataset.scene = next.dataset.scene || n + 1;
     stage.style.setProperty('--sm-progress', slides.length > 1 ? n / (slides.length - 1) : 1);
     if (next.dataset.cam !== undefined) stage.querySelectorAll('[data-parallax]').forEach(l => {
+      if (!prev) l.style.transition = 'none';   // first slide: stand in place, do not pan from 0
       l.style.transform = `translateX(${-(+next.dataset.cam) * +l.dataset.parallax}px)`;
+      if (!prev) { l.getBoundingClientRect(); l.style.transition = ''; }
     });
     count(next);
     history.replaceState(null, '', '#' + (n + 1));
