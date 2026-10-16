@@ -21,7 +21,7 @@ Chép thư mục repo vào `~/.claude/skills/slidemotion`, rồi nói: "làm sli
 ## Trạng thái
 
 - [x] Giai đoạn 1: runtime, SKILL.md, từ điển chuyển động, 5 thẻ style thử, 2 deck mẫu
-- [ ] Giai đoạn 2: đủ 85 thẻ style
+- [x] Giai đoạn 2: đủ 85 thẻ style
 - [ ] Giai đoạn 3: xuất PowerPoint giữ hiệu ứng tương ứng
 - [ ] Giai đoạn 4: GIF demo, trang giới thiệu
 
