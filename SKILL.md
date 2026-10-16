@@ -94,7 +94,16 @@ Rồi lập bảng ngắn, mỗi slide một dòng:
 - Khai báo token màu, chữ của style trong `:root` hoặc `.sm-stage`. CSS riêng từng slide gắn với lớp riêng của slide đó.
 - Minh họa vẽ bằng SVG inline theo ngôn ngữ minh họa của thẻ style. Vẽ đúng vật của nội dung, không vẽ hình trang trí vô nghĩa.
 - Hiệu ứng: thuộc tính của runtime (`data-anim`, `data-delay`, `data-loop`, `data-step`, `data-morph`, `data-count`) cho phần nền; tự viết CSS keyframes hoặc SVG `animateMotion` cho khoảnh khắc đặc biệt.
-- **Lớp điện ảnh** `runtime/cinema.js` (chép vào sau `deck.js`, không cần thư viện, chạy offline):
+- **Chuyển động chính bằng GSAP** (mặc định cho mọi deck chiếu, đã nhúng sẵn `runtime/vendor/gsap-3.15.0/`, chạy offline):
+  - Thứ tự script cuối trang: các tệp GSAP (gsap, SplitText, DrawSVGPlugin, MorphSVGPlugin, MotionPathPlugin, Flip, CustomEase, CustomBounce, ScrambleTextPlugin), `deck.js`, `gsap-scenes.js`, rồi script cảnh của deck.
+  - Mỗi slide một cảnh: `scene('.s8', (s, tl, k) => { ... })`. Phần đầu timeline là cảnh vào; `tl.addLabel('step1')` mở đoạn chạy khi bấm lần 1, `step2` cho lần 2... Slide ghi `data-steps="n"` đúng bằng số nhãn. Bấm lùi thì tua ngược.
+  - **HTML là trạng thái cuối**, cảnh vào dùng `from()`/`fromTo()`; trạng thái phụ ban đầu đặt bằng `gsap.set` trong hàm cảnh (tự hoàn nguyên khi rời slide và khi in). Nhờ vậy Ctrl+P và máy không chạy được GSAP vẫn ra slide đủ.
+  - Đo vị trí trước khi tạo tween (`k.px(el)` trả hộp theo px sân khấu), để làm cảnh "chữ văng từ câu xuống hàng token". Đo không dính transform thì dùng `offsetLeft/offsetTop` sau `document.fonts.ready`.
+  - Thứ lặp suốt slide bọc trong `k.loop(gsap.to(...))`.
+  - Chọn plugin theo động từ: MotionPath (đi theo đường, bay vòng cung), SplitText (chữ bay từng ký tự, từng từ; đoạn văn tách theo `words`, đừng tách `lines` vì dễ vỡ dòng), DrawSVG (đường tự vẽ, rút lại), MorphSVG (hình biến hình), Flip (sắp xếp lại chỗ), CustomBounce (nảy dẹp người), ScrambleText (giải mã chữ, nhãn đổi).
+  - Nhịp: chữ chính vào xong trong khoảng 1,5 giây; ease `back.out`, `bounce.out`, `elastic.out` cho vật có cá tính, `power3.inOut` cho máy quay lia.
+  - Tự soát khung hình: chèn `gsap.ticker.lagSmoothing(0)` và script dừng timeline ở giây `t` (`scenes.live.tl.pause().seek(t)`), chụp vài mốc giây cho mỗi cảnh; trình duyệt chạy ngầm không chạy GSAP theo thời gian thật.
+- **Lớp điện ảnh** `runtime/cinema.js` (thay thế nhẹ khi không muốn nhúng GSAP) (chép vào sau `deck.js`, không cần thư viện, chạy offline):
   - `data-trans` trên slide, cách slide đó **đến**: `iris` (vòng tròn mở từ `data-origin="30% 60%"`), `zoom` (lao xuyên qua), `push` (đẩy ngang, đi lùi thì đẩy ngược), `shutter` (8 lá chớp, màu `data-trans-color`), `flash` (lóe sáng). Mỗi kiểu một vai: vào trạm mới thì `iris`, câu hỏi kiểm tra thì `zoom`, trong cùng một trạm thì `push`, sang phần tóm tắt thì `shutter`, khoảnh khắc sốc thì `flash`.
   - `data-fx` trên phần tử: `chars` (từng ký tự lật lên), `words` (từng chữ hiện rõ), `scramble` (giải mã chữ), `spring` (bật vào như lò xo, hướng từ `data-from="x,y"`), `curtain` (dải màu quét qua để lộ chữ), `glow` (lóe sáng rồi rõ), `flip` (thẻ lật vào), `kenburns` (ảnh nền trôi chậm). Dùng chung `data-delay`, `data-dur`, `data-stagger`; đi cùng `data-step` thì chạy khi bấm tới.
   - `data-depth="0.012"` trên ảnh nền, lớp hình: dịch nhẹ theo chuột, tạo chiều sâu. `data-particles="#ffc070,60"` trên một khối phủ: hạt sáng bay lên.
