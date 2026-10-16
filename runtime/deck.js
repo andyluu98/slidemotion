@@ -133,8 +133,8 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
     history.replaceState(null, '', '#' + (n + 1));
     stage.dispatchEvent(new CustomEvent('sm:change', { detail: { index: n, slide: next } }));
   }
-  const nextStep = () => step < maxStep(slides[cur]) ? showSteps(slides[cur], ++step) : go(cur + 1);
-  const prevStep = () => step > 0 ? showSteps(slides[cur], --step) : go(cur - 1, true);
+  const nextStep = () => cur < 0 ? go(0) : step < maxStep(slides[cur]) ? showSteps(slides[cur], ++step) : go(cur + 1);
+  const prevStep = () => cur < 0 ? go(0) : step > 0 ? showSteps(slides[cur], --step) : go(cur - 1, true);
 
   addEventListener('keydown', e => {
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); nextStep(); }
@@ -158,5 +158,6 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
   addEventListener('resize', fit);
   fit();
   window.deck = { go: i => go(i, true), next: nextStep, prev: prevStep, get index() { return cur; }, count: slides.length, stage, slides };
-  requestAnimationFrame(() => go((parseInt(location.hash.slice(1)) || 1) - 1));
+  // setTimeout, not requestAnimationFrame: rAF never fires while the tab is hidden
+  setTimeout(() => cur < 0 && go((parseInt(location.hash.slice(1)) || 1) - 1), 0);
 })();
