@@ -80,3 +80,25 @@ Lưu ý `data-morph`: phần tử morph không tự mang `transform` riêng (mu�
 - Minh họa SVG giữ dạng vector. Màu nét, màu tô ghi thẳng trên phần tử hoặc qua lớp CSS có tên rõ ràng.
 - Hiệu ứng khai bằng thuộc tính `data-anim`, `data-loop`, `data-step`, `data-morph` sẽ được dịch sang PowerPoint theo bảng trên. Hiệu ứng tự viết bằng CSS keyframes thì bản PPTX hạ về Fade.
 - Bộ xuất đọc bố cục thật từ trang đang chạy (runtime sẽ có hàm xuất vị trí và kiểu của từng phần tử ra JSON), nên CSS tự do vẫn xuất được, không bắt viết vị trí inline. Không cần Playwright: lấy JSON bằng trình duyệt của app hoặc Edge, Chrome có sẵn trên máy.
+
+## Lớp điện ảnh (`runtime/cinema.js`)
+
+Bản chiếu HTML dùng hết; khi xuất PowerPoint thì hạ theo cột cuối.
+
+| Động từ của ý | Thuộc tính | Hợp với | PowerPoint | Tầng |
+|---|---|---|---|---|
+| bước vào nơi mới, mở ra một thế giới | `data-trans="iris"` | vào trạm, chương mới | Transition Circle (Shape) | 1 |
+| lao vào, tập trung, hỏi thẳng | `data-trans="zoom"` | câu hỏi kiểm tra, cú sốc | Transition Zoom | 1 |
+| đi tiếp, sang trang | `data-trans="push"` | slide trong cùng một phần | Transition Push | 1 |
+| khép lại, chuyển hồi | `data-trans="shutter"` | sang tóm tắt, sang phần mới | Transition Blinds | 1 |
+| bất ngờ, chói, cảnh báo | `data-trans="flash"` | khoảnh khắc sốc | Transition Flash | 1 |
+| nói ra từng tiếng, tuyên bố | `data-fx="chars"` | tiêu đề lớn, câu chốt | Fade, By letter | 1 |
+| kể, giải thích | `data-fx="words"` | đoạn chữ, tiêu đề | Fade, By word | 1 |
+| giải mã, máy tính đọc | `data-fx="scramble"` | nhãn, mã, kicker | Fade | 2 |
+| bật vào, nảy, được ném tới | `data-fx="spring"` | thẻ, viên gạch, mảnh | Fly In + Bounce end | 1 |
+| vén màn, tiết lộ | `data-fx="curtain"` | tiêu đề, con số | Wipe | 2 |
+| lóe lên, tỏa sáng | `data-fx="glow"` | chữ kết, ngôi sao, nhãn | Fade | 2 |
+| lật bài, so sánh | `data-fx="flip"` | thẻ, phương án | Transition Flip hoặc Fade | 2 |
+| trôi, thời gian trôi | `data-fx="kenburns"` | ảnh nền | Motion path rất chậm hoặc bỏ | 2 |
+| chiều sâu, không gian | `data-depth` | lớp ảnh, lớp hình | bỏ | 2 |
+| không khí, sống, ấm | `data-particles` | nền tối | bỏ | 2 |

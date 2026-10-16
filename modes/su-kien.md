@@ -19,7 +19,8 @@ Ví dụ đầy đủ: `examples/03_mot-ngay-o-cong-truong.html` (toàn cảnh l
 ## Nhịp
 - Bìa và kết là hai cảnh đắt nhất; dồn công vào đó.
 - Xen một slide gần như trống (một câu giữa toàn cảnh) sau mỗi 3 đến 4 slide dày.
-- Mỗi slide hiện xong trong 2,5 giây; nền có thể sống tiếp bằng một thứ lặp nhẹ.
+- Chữ chính hiện xong trong khoảng 1,5 giây; nền, ảnh, hạt sáng được sống tiếp suốt slide.
+- Dùng hết `runtime/cinema.js`: chuyển cảnh mỗi phần một kiểu, chữ tách ký tự cho câu lớn, ảnh AI cho mọi cảnh lớn (Bước 2b của SKILL.md).
 
 ## Giới hạn
 - Hiệu ứng điện ảnh phần lớn là tầng 2: sang PowerPoint sẽ hạ về hiệu ứng đơn giản. Chế độ này nên giao HTML để chiếu.

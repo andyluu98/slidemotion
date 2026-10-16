@@ -22,11 +22,13 @@ Học viên quen nhịp này sau hai khái niệm, từ đó họ tự đoán đ
 - **Slide thực hành**: đề bài, thời gian, sản phẩm cần nộp.
 - **Kết**: trả lời câu hỏi lớn ở bìa, một câu.
 
-## Hiệu ứng: tiết chế, phục vụ lời giảng
-- **Bấm từng bước** là công cụ chính: người dạy nói tới đâu, hình hiện tới đó.
-- Chuyển động chỉ dùng chỗ cần giải thích (dòng dữ liệu chạy, bậc thang lên, mực đậm dần qua từng bước).
-- Nền lia, trời đổi màu: được, nhưng chỉ khi **chuyển phần**, không lia giữa lúc học viên đang đọc chữ.
-- Tối đa một thứ lặp mỗi slide; slide nhiều chữ thì không lặp.
+## Hiệu ứng: đẹp hết cỡ, nhưng chữ đứng yên khi đang đọc
+Học viên nhớ bài giảng đẹp lâu hơn bài giảng phẳng. Được chơi lớn: ảnh có chiều sâu, chuyển cảnh, chữ bay, hạt sáng.
+- **Bấm từng bước** vẫn là công cụ chính: người dạy nói tới đâu, hình hiện tới đó.
+- **Chuyển cảnh có nghĩa** (`data-trans` trong `runtime/cinema.js`): vào trạm mới thì mở vòng tròn, câu hỏi kiểm tra thì lao vào, trong một trạm thì đẩy ngang, tóm tắt thì lá chớp. Học viên nghe nhịp chuyển là biết mình đang ở đâu.
+- **Mỗi trạm một ảnh** cùng một thế giới (Bước 2b của SKILL.md), ảnh trôi chậm phía sau chữ.
+- **Chữ chính hiện xong trong 1,5 giây** rồi đứng yên; thứ chuyển động liên tục chỉ nằm ở nền hoặc ở hình minh họa.
+- Khoảnh khắc "à ra thế" (đổi một chữ thì nghĩa đổi, vặn núm thì cột dẹt xuống) đáng giá hơn mọi hiệu ứng trang trí: mỗi phần nên có ít nhất một.
 
 ## Chữ và mật độ
 - Chữ thân từ 30px, tiêu đề 64px trở lên. Phòng học xa màn hình hơn phòng họp.

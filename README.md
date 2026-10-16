@@ -15,6 +15,7 @@ SlideMotion là một skill cho Claude Code (và các agent đọc được SKIL
 | `styles/` | `INDEX.md` để chọn style, mỗi style một thẻ gợi ý (màu, chữ, ngôn ngữ minh họa, chữ ký chuyển động, khoảnh khắc đáng nhớ) |
 | `motion/tu-dien.md` | Động từ của ý, hiệu ứng HTML tương ứng, hiệu ứng PowerPoint tương ứng |
 | `runtime/deck.js` | Co khung 16:9, điều hướng, `data-anim`, `data-loop`, `data-step`, `data-morph`, `data-count`, toàn cảnh lia (`data-cam`, `data-parallax`), in bản phát tay (Ctrl+P) |
+| `runtime/cinema.js` | Lớp điện ảnh tùy chọn, không cần thư viện: chuyển cảnh (`data-trans`), chữ tách ký tự, lò xo, lật thẻ, ảnh trôi (`data-fx`), chiều sâu theo chuột, hạt sáng |
 | `examples/` | Cùng chủ đề AI trong xây dựng, dựng theo ba cách khác hẳn nhau (blueprint, bảng trắng, "một ngày ở công trường") |
 
 ## Cài vào Claude Code

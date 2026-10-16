@@ -16,6 +16,7 @@ styles/INDEX.md       bảng chọn style theo chủ đề, cảm xúc
 styles/<slug>.md      thẻ style: hình dung, màu, chữ, minh họa, chữ ký chuyển động, khoảnh khắc đáng nhớ
 motion/tu-dien.md     từ điển chuyển động: ý của câu -> hiệu ứng HTML -> hiệu ứng PowerPoint tương ứng
 runtime/deck.js       co khung 16:9, điều hướng, data-anim, data-loop, data-step, data-morph, data-count
+runtime/cinema.js     lớp điện ảnh (tùy chọn, nạp sau deck.js): chuyển cảnh, chữ tách ký tự, lò xo, chiều sâu theo chuột, hạt sáng
 runtime/khoi-dau.html bộ khung trống tối thiểu (chỉ là vỏ, không có bố cục)
 scenes/cong-thuc.md   công thức cơ chế (bấm từng bước, câu hỏi kiểm tra, toàn cảnh lia, vật xuyên suốt...), không có bố cục
 examples/             deck mẫu để thấy mức chịu chơi, không để chép; không mở deck trùng chủ đề với deck đang làm
@@ -31,6 +32,8 @@ tests/                tệp kiểm thử runtime, không dùng làm mẫu thiế
 - **Chữ là chữ, không vẽ chữ vào ảnh.** Câu cần sửa để ngoài SVG, để xuất PowerPoint còn sửa được.
 
 Mọi thứ khác dưới đây là gợi ý nghề. Phá được nếu có lý do tốt cho nội dung.
+
+**Hai tầng, không kéo nhau xuống.** Bản HTML để chiếu được làm hết cỡ: ảnh, chuyển cảnh, chữ bay, chiều sâu. Bản PowerPoint (khi xin) tự hạ hiệu ứng về mức gần nhất. Đừng làm bản chiếu nghèo đi chỉ vì PowerPoint nghèo hiệu ứng; riêng chế độ `bao-cao` thì ưu tiên sửa được.
 
 ## 2. Quy trình
 
@@ -54,6 +57,17 @@ Hỏi ngay câu đầu (trừ khi người dùng đã nói rõ), rồi đọc `m
 - Người dùng nêu tên thì dùng. Chưa nêu thì đọc `styles/INDEX.md`, gợi ý 3 style: một **hợp** chủ đề, một **khác nền** (sáng/tối ngược lại), một **bất ngờ**. Nói ngắn vì sao.
 - Đọc kỹ thẻ style đã chọn. Thẻ là **cảm hứng có căn cứ**: giữ bảng màu, chữ, chất liệu, chữ ký chuyển động; còn bố cục và hình từng slide là việc của bạn.
 - Được trộn: nền của style này với chữ ký chuyển động của style kia, nếu hợp nội dung.
+
+### Bước 2b. Ảnh cho cảnh lớn (khi có công cụ tạo ảnh)
+SVG tự vẽ thì phẳng; slide đẹp ngoài kia thường có ảnh có chiều sâu, ánh sáng. Có công cụ tạo ảnh (ví dụ MCP `chatgpt-image`, hàm `generate_image`) thì tạo 6 đến 10 ảnh cho bìa, mỗi trạm hoặc phần, và kết:
+- **Một thế giới cho cả bộ ảnh**: lặp lại cùng một câu mô tả chất liệu, ánh sáng, bảng màu, ống kính trong mọi prompt (ví dụ "miniature diorama, tilt-shift, deep navy shadows, warm amber glow"), và một nhân vật xuất hiện lại. Bộ ảnh phải trông như cùng một bộ phim.
+- **Mỗi ảnh là một ẩn dụ của ý**, không phải cảnh minh họa chung chung (cửa sổ ngữ cảnh: cái bàn đầy giấy, tờ cũ rơi khỏi mép).
+- **Chừa chỗ cho chữ**: ghi trong prompt phần khung nào tối và yên ("left third darker and calm for overlay text").
+- **Cấm chữ trong ảnh**: thêm "absolutely no letters, words, text or signage". Chữ luôn là chữ HTML.
+- Xem ảnh trước khi dùng; ảnh hỏng hoặc có chữ thì tạo lại. Ghi "ảnh minh họa tạo bằng AI" khi bàn giao.
+- Nhúng vào một file: mỗi ảnh một biến CSS `--img-ten:url(data:image/jpeg;base64,...)` ở `:root`, các slide dùng `background-image:var(--img-ten)`, để ảnh dùng lại nhiều lần không bị chép nhiều lần. Ảnh JPEG rộng 1920, chất lượng khoảng 78.
+
+Không có công cụ tạo ảnh thì dựng chiều sâu bằng CSS: nhiều lớp gradient, vệt sáng, sương, hạt sáng (`data-particles`).
 
 ### Bước 3. Ý tưởng lớn, rồi kịch bản đạo diễn (trước khi viết code)
 **Ý tưởng lớn trước, style sau.** Viết một câu: deck này diễn ra trong *thế giới* nào, theo *trục* nào, với *nhân vật* nào. Ví dụ: "Một ngày ở công trường: bầu trời đi từ bình minh tới đêm, chiếc mũ bảo hộ phát sáng là agent." Thẻ style chỉ quyết định vẻ ngoài; câu chuyện mới làm deck có hồn.
@@ -79,8 +93,14 @@ Rồi lập bảng ngắn, mỗi slide một dòng:
 - Toàn cảnh lia (`su-kien`, có thể dùng cho `giang-day`): đặt các lớp nền ngoài slide với `data-parallax="0.3"` (xa) đến `"1"` (gần), mỗi slide ghi `data-cam="<px>"`; runtime tự trượt các lớp.
 - Khai báo token màu, chữ của style trong `:root` hoặc `.sm-stage`. CSS riêng từng slide gắn với lớp riêng của slide đó.
 - Minh họa vẽ bằng SVG inline theo ngôn ngữ minh họa của thẻ style. Vẽ đúng vật của nội dung, không vẽ hình trang trí vô nghĩa.
-- Hiệu ứng: dùng thuộc tính của runtime (`data-anim`, `data-delay`, `data-loop`, `data-step`, `data-morph`, `data-count`) cho phần lớn; tự viết CSS keyframes hoặc SVG `animateMotion` cho khoảnh khắc đặc biệt. Xem bảng tầng trong `motion/tu-dien.md` nếu deck sẽ xuất PowerPoint.
-- Mỗi slide hiện xong trong khoảng 2,5 giây để người nói không phải chờ; chi tiết phụ có thể lặp nhẹ (`data-loop`) để slide không chết.
+- Hiệu ứng: thuộc tính của runtime (`data-anim`, `data-delay`, `data-loop`, `data-step`, `data-morph`, `data-count`) cho phần nền; tự viết CSS keyframes hoặc SVG `animateMotion` cho khoảnh khắc đặc biệt.
+- **Lớp điện ảnh** `runtime/cinema.js` (chép vào sau `deck.js`, không cần thư viện, chạy offline):
+  - `data-trans` trên slide, cách slide đó **đến**: `iris` (vòng tròn mở từ `data-origin="30% 60%"`), `zoom` (lao xuyên qua), `push` (đẩy ngang, đi lùi thì đẩy ngược), `shutter` (8 lá chớp, màu `data-trans-color`), `flash` (lóe sáng). Mỗi kiểu một vai: vào trạm mới thì `iris`, câu hỏi kiểm tra thì `zoom`, trong cùng một trạm thì `push`, sang phần tóm tắt thì `shutter`, khoảnh khắc sốc thì `flash`.
+  - `data-fx` trên phần tử: `chars` (từng ký tự lật lên), `words` (từng chữ hiện rõ), `scramble` (giải mã chữ), `spring` (bật vào như lò xo, hướng từ `data-from="x,y"`), `curtain` (dải màu quét qua để lộ chữ), `glow` (lóe sáng rồi rõ), `flip` (thẻ lật vào), `kenburns` (ảnh nền trôi chậm). Dùng chung `data-delay`, `data-dur`, `data-stagger`; đi cùng `data-step` thì chạy khi bấm tới.
+  - `data-depth="0.012"` trên ảnh nền, lớp hình: dịch nhẹ theo chuột, tạo chiều sâu. `data-particles="#ffc070,60"` trên một khối phủ: hạt sáng bay lên.
+  - `data-fx` và `data-anim` đều đặt lại `transform`: phần tử đã tự xoay, tự dịch bằng `transform` thì bọc một lớp ngoài và gắn hiệu ứng lên lớp ngoài.
+- Xem bảng tầng trong `motion/tu-dien.md` nếu deck sẽ xuất PowerPoint.
+- **Chữ chính đọc được ngay**: tiêu đề và ý chính hiện xong trong khoảng 1,5 giây; phần nền, ảnh, hạt sáng được sống tiếp suốt slide.
 
 ### Bước 5. Tự xem và sửa
 Mở bằng trình duyệt của app, đi qua **từng** slide, chờ hiệu ứng chạy xong rồi chụp. Soát theo bảng:
@@ -95,6 +115,9 @@ Mở bằng trình duyệt của app, đi qua **từng** slide, chờ hiệu ứ
 | Số có nguồn? | ghi nguồn hoặc bỏ số |
 | Có lỗi console? | sửa |
 | Slide nào giống y một slide trong `examples/` về bố cục và hình? | đổi lại cho hợp câu chuyện của deck này |
+| Deck có ít nhất 3 khoảnh khắc khiến người xem "ồ" lên (chuyển cảnh, chữ đổi nghĩa, hình biến hình)? | dồn công vào bìa, chỗ "à ra thế", kết |
+| Đặt cạnh một slide đẹp trên mạng (Dribbble, keynote ra mắt sản phẩm), slide này có trông nghèo hơn: phẳng, ít chiều sâu, ít ánh sáng? | thêm ảnh hoặc lớp sáng, kính mờ, hạt, chuyển cảnh |
+| Có slide nào chỉ có chữ trên nền trơn mà không phải slide nghỉ có chủ đích? | thêm hình, ảnh, hoặc biến thành khoảnh khắc chữ lớn |
 
 Sửa tới khi qua hết. Không giao khi chưa tự xem.
 
@@ -109,8 +132,9 @@ Sửa tới khi qua hết. Không giao khi chưa tự xem.
 - **Bố cục:** mỗi slide tự chọn dáng theo ý: chữ khổng lồ cắt mép, nửa hình nửa chữ, lưới bất đối xứng, sơ đồ chiếm cả slide, một câu giữa khoảng trống lớn. Khoảng trống là công cụ, không phải lỗi.
 - **Màu:** một màu nhấn dành cho điều quan trọng nhất của slide. Hai thứ cùng nhấn thì một thứ thừa.
 - **Hiệu ứng vào:** đa dạng theo vai: tiêu đề `wipe` hoặc `blur`, thẻ `drop` hoặc `pop`, sơ đồ `draw`, con số `count`, phán quyết `stamp`. Đừng cho tất cả cùng `rise`.
-- **Lặp nhẹ:** chấm chạy trên đường, vạch quét, nhịp đập, đung đưa. Mỗi slide tối đa hai thứ lặp, đừng để rối mắt.
+- **Lặp nhẹ:** chấm chạy trên đường, vạch quét, nhịp đập, đung đưa, hạt sáng, ảnh trôi. Không giới hạn số lượng, chỉ cần không kéo mắt khỏi chữ đang đọc.
 - **Ảnh thật:** chỉ dùng ảnh có giấy phép, ghi nguồn. Ảnh minh họa AI thì ghi rõ.
+- **Chiều sâu:** ảnh nền, lớp phủ tối phía có chữ, khung kính mờ, hạt sáng là bộ bốn rẻ mà sang. Phủ tối bằng gradient từ mép có chữ, đừng phủ đều cả ảnh.
 
 ## 4. Lỗi hay gặp (để tránh)
 - Slide nào cũng "tiêu đề trái trên, gạch đầu dòng dưới, ô điểm nhấn phải".
@@ -123,6 +147,8 @@ Sửa tới khi qua hết. Không giao khi chưa tự xem.
 - Lớp xuyên suốt (vật đi qua nhiều slide) điều khiển bằng sự kiện `sm:change`: trong hàm nghe, lần đặt đầu tiên tắt `transition` để vật không bay vào từ góc trái trên; sau khi gắn hàm nghe, gọi luôn một lần nếu `deck.index >= 0`.
 - Nền riêng của từng slide (sáng, tối) đặt trên chính `<section>`, không đặt trên `.sm-stage` theo `data-scene`: khi in bản phát tay, mọi slide dùng chung nền của sân khấu.
 - Tự chụp để soát: Edge hoặc Chrome có sẵn chạy `--headless=new --user-data-dir=<thư mục tạm riêng cho mỗi lần chụp> --window-size=1920,1080 --virtual-time-budget=9000 --screenshot=...`. Dùng chung hồ sơ thì lệnh trả về ngay mà không ghi ảnh, hoặc lấy bản cũ trong bộ nhớ đệm.
+- Trình duyệt chạy ngầm gần như không vẽ khung hình: ảnh chụp giữa lúc chuyển cảnh (`data-trans`) có thể kẹt ở nửa vòng tròn, và không đo được số khung hình mỗi giây. Chụp trạng thái cuối bằng cách mở thẳng `#số-slide`; muốn chụp trạng thái sau khi bấm thì chèn script gọi `deck.go(i)` (hiện đủ bước). Độ mượt thật phải xem trên máy có card đồ họa.
+- Hiệu năng: ảnh nền có `filter: blur()` thêm `will-change: transform`; không dùng `shadowBlur` của canvas cho nhiều hạt (vẽ sẵn một đốm sáng rồi `drawImage`); `backdrop-filter` giữ khoảng 12px.
 
 ## 5. Chế độ nhanh
 Người dùng nói "nhanh", "ít token" hoặc deck trên 25 slide: dựng 3 đến 4 "cảnh" dùng lại (một cảnh quy trình, một cảnh so sánh, một cảnh con số), thay nội dung; dồn minh họa riêng cho bìa, khoảnh khắc chính và kết.
