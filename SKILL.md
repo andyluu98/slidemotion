@@ -98,6 +98,7 @@ Sửa tới khi qua hết. Không giao khi chưa tự xem.
 - Chữ nằm trong ảnh hoặc SVG nên không sửa được khi sang PowerPoint.
 - `data-anim` gắn lên khối cao 0px (chỉ chứa phần tử `position:absolute`): trình duyệt không chạy chuyển động, khối kẹt ở trạng thái ẩn. Gắn `data-anim` lên chính phần tử có kích thước.
 - Phần tử vừa xoay vừa có `data-anim`: hiệu ứng vào đặt lại `transform` nên mất góc xoay. Xoay bằng thuộc tính riêng `rotate: 30deg` (hoặc bọc thêm một lớp).
+- Lớp xuyên suốt (vật đi qua nhiều slide) điều khiển bằng sự kiện `sm:change`: trong hàm nghe, lần đặt đầu tiên tắt `transition` để vật không bay vào từ góc trái trên; sau khi gắn hàm nghe, gọi luôn một lần nếu `deck.index >= 0`.
 - Tự chụp để soát: Edge hoặc Chrome có sẵn chạy `--headless=new --user-data-dir=<thư mục tạm riêng cho mỗi lần chụp> --window-size=1920,1080 --virtual-time-budget=9000 --screenshot=...`. Dùng chung hồ sơ thì lệnh trả về ngay mà không ghi ảnh, hoặc lấy bản cũ trong bộ nhớ đệm.
 
 ## 5. Chế độ nhanh
