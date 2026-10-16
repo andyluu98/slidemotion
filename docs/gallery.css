@@ -1,0 +1,37 @@
+/* thư viện style: thẻ có ảnh slide mẫu, rê chuột đổi ảnh thứ hai */
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:34px}
+.filters button{font:600 13.5px var(--sans);color:var(--mut);background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer}
+.filters button.on{color:#140A05;background:var(--ac);border-color:var(--ac)}
+.filters input{flex:1;min-width:220px;max-width:360px;font:500 14px var(--sans);color:var(--fg);background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:9px 16px;outline:none}
+.filters input:focus{border-color:var(--ac)}
+.filters .cnt{font:500 13px var(--mono);color:var(--dim);margin-left:4px}
+.gal{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:22px}
+.st{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,border-color .2s}
+.st:hover{transform:translateY(-3px);border-color:#3c3c4e}
+.st .th{position:relative;display:block;aspect-ratio:16/9;background:#000;overflow:hidden}
+.st .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .35s,transform .6s}
+.st .th img.alt{opacity:0}
+.st:hover .th img.alt{opacity:1}
+.st:hover .th img{transform:scale(1.03)}
+.st .th .play{position:absolute;right:8px;bottom:8px;font:600 11px var(--sans);background:rgba(0,0,0,.65);color:#fff;padding:4px 9px;border-radius:999px;opacity:0;transition:opacity .2s}
+.st:hover .th .play{opacity:1}
+.st .b{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1}
+.st .n{font-weight:700;font-size:16px}
+.st .n small{color:var(--dim);font-weight:500;margin-right:6px}
+.st .s{font:500 12px var(--mono);color:var(--dim);margin-top:2px}
+.st .md{font-size:13.5px;color:var(--mut);margin-top:8px;line-height:1.5}
+.st .tg{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.st .tg span{font-size:11.5px;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.st .f{font-size:12px;color:var(--dim);margin-top:10px}
+.st .act{display:flex;gap:6px;margin-top:auto;padding-top:14px}
+.st .act button,.st .act a{font:600 12.5px var(--sans);padding:7px 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg2);color:var(--fg);cursor:pointer;line-height:1.2}
+.st .act button.p{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.st .act button:hover,.st .act a:hover{border-color:var(--ac)}
+.st .act a{margin-left:auto;color:var(--mut)}
+.more{display:flex;justify-content:center;margin-top:28px}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+.how div{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--mut)}
+.how b{color:var(--fg)}
+@media (max-width:1100px){.gal{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:820px){.gal,.how{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.gal,.how{grid-template-columns:1fr}}
