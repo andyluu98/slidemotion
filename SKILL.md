@@ -58,8 +58,8 @@ Hỏi ngay câu đầu (trừ khi người dùng đã nói rõ), rồi đọc `m
 - Đọc kỹ thẻ style đã chọn. Thẻ là **cảm hứng có căn cứ**: giữ bảng màu, chữ, chất liệu, chữ ký chuyển động; còn bố cục và hình từng slide là việc của bạn.
 - Được trộn: nền của style này với chữ ký chuyển động của style kia, nếu hợp nội dung.
 
-### Bước 2b. Ảnh cho cảnh lớn (khi có công cụ tạo ảnh)
-SVG tự vẽ thì phẳng; slide đẹp ngoài kia thường có ảnh có chiều sâu, ánh sáng. Có công cụ tạo ảnh (ví dụ MCP `chatgpt-image`, hàm `generate_image`) thì tạo 6 đến 10 ảnh cho bìa, mỗi trạm hoặc phần, và kết:
+### Bước 2b. Ảnh AI cho cảnh lớn (chỉ khi người dùng yêu cầu)
+Mặc định **không** tạo ảnh: tốn thời gian chờ, và người dùng thấy bộ hình vẽ SVG theo thẻ style đẹp hơn ảnh. Vẻ đẹp nên đến từ chuyển động dàn dựng (GSAP). Chỉ khi người dùng xin ảnh thì dùng công cụ tạo ảnh (ví dụ MCP `chatgpt-image`, hàm `generate_image`) cho bìa, mỗi phần, và kết:
 - **Một thế giới cho cả bộ ảnh**: lặp lại cùng một câu mô tả chất liệu, ánh sáng, bảng màu, ống kính trong mọi prompt (ví dụ "miniature diorama, tilt-shift, deep navy shadows, warm amber glow"), và một nhân vật xuất hiện lại. Bộ ảnh phải trông như cùng một bộ phim.
 - **Mỗi ảnh là một ẩn dụ của ý**, không phải cảnh minh họa chung chung (cửa sổ ngữ cảnh: cái bàn đầy giấy, tờ cũ rơi khỏi mép).
 - **Chừa chỗ cho chữ**: ghi trong prompt phần khung nào tối và yên ("left third darker and calm for overlay text").

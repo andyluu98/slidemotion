@@ -4,6 +4,7 @@
    - data-anim (enter effects), data-loop (ambient loops), data-step (click reveals)
    - data-morph="id": same id on consecutive slides glides between positions (Morph by name)
    - data-count="1234": number counts up on entry
+   - data-steps="n" on a slide: n clicks driven by a script; events 'sm:change' and 'sm:step' carry { index, slide, step }
    - copies the slide's data-scene onto the stage, so persistent layers can morph with plain CSS
    - data-cam on a slide + data-parallax="0.3..1" on background layers: camera pan with depth
    - print (Ctrl+P): every slide on its own page, every step shown, no motion: a handout
@@ -15,6 +16,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden}
 .sm-stage{position:absolute;width:${W}px;height:${H}px;transform-origin:0 0;overflow:hidden;--sm-ease:cubic-bezier(.2,.8,.2,1)}
 .sm-stage>.slide{position:absolute;inset:0;visibility:hidden;opacity:0;transition:opacity var(--sm-tr,.5s) ease,visibility 0s var(--sm-tr,.5s)}
 .sm-stage>.slide.on{visibility:visible;opacity:1;z-index:1;transition:opacity var(--sm-tr,.5s) ease}
+.sm-stage:not(.sm-ready)>.slide{transition:none!important}
 .slide[data-transition=cut]{--sm-tr:0s}
 .slide[data-transition=wipe].on{animation:sm-wipe .7s var(--sm-ease)}
 .slide[data-transition=zoom].on{animation:sm-zoomin .7s var(--sm-ease)}
@@ -87,7 +89,8 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
     if (e.dataset.loopDur) e.style.setProperty('--sm-loop', e.dataset.loopDur + 'ms');
   });
 
-  const maxStep = s => Math.max(0, ...[...s.querySelectorAll('[data-step]')].map(e => +e.dataset.step));
+  // data-steps on a slide: clicks handled by a script (e.g. a GSAP timeline), not by [data-step] elements
+  const maxStep = s => Math.max(+(s.dataset.steps || 0), ...[...s.querySelectorAll('[data-step]')].map(e => +e.dataset.step));
   const showSteps = (s, n) => s.querySelectorAll('[data-step]').forEach(e => e.classList.toggle('sm-shown', +e.dataset.step <= n));
 
   function fit() {
@@ -145,10 +148,11 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
     });
     count(next);
     history.replaceState(null, '', '#' + (n + 1));
-    stage.dispatchEvent(new CustomEvent('sm:change', { detail: { index: n, slide: next } }));
+    stage.dispatchEvent(new CustomEvent('sm:change', { detail: { index: n, slide: next, step, full } }));
   }
-  const nextStep = () => cur < 0 ? go(0) : step < maxStep(slides[cur]) ? showSteps(slides[cur], ++step) : go(cur + 1);
-  const prevStep = () => cur < 0 ? go(0) : step > 0 ? showSteps(slides[cur], --step) : go(cur - 1, true);
+  const stepTo = n => { step = n; showSteps(slides[cur], n); stage.dispatchEvent(new CustomEvent('sm:step', { detail: { index: cur, slide: slides[cur], step: n } })); };
+  const nextStep = () => cur < 0 ? go(0) : step < maxStep(slides[cur]) ? stepTo(step + 1) : go(cur + 1);
+  const prevStep = () => cur < 0 ? go(0) : step > 0 ? stepTo(step - 1) : go(cur - 1, true);
 
   addEventListener('keydown', e => {
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); nextStep(); }
@@ -174,6 +178,8 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
   window.deck = { go: i => go(i, true), next: nextStep, prev: prevStep, get index() { return cur; }, count: slides.length, stage, slides };
   // start after the whole page is parsed, so listeners on 'sm:change' in later scripts catch the first slide;
   // setTimeout, not requestAnimationFrame: rAF never fires while the tab is hidden
-  const start = () => setTimeout(() => cur < 0 && go((parseInt(location.hash.slice(1)) || 1) - 1), 0);
+  // until the first slide is up, slides switch without fading: otherwise every slide painted before this script
+  // ran would fade out together on load
+  const start = () => setTimeout(() => { cur < 0 && go((parseInt(location.hash.slice(1)) || 1) - 1); setTimeout(() => stage.classList.add('sm-ready'), 60); }, 0);
   document.readyState === 'loading' ? addEventListener('DOMContentLoaded', start) : start();
 })();
