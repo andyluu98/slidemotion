@@ -46,6 +46,11 @@ def roles(pairs, group):
     return bg, fg, ac, ac2
 
 
+# ảnh slide mẫu lấy từ SlideFly (tools/lay-anh-style.py); deck demo xem trên trang SlideFly
+shots = root / 'docs' / 'assets' / 'styles'
+demos = json.loads((shots / 'demo.json').read_text(encoding='utf8')) if (shots / 'demo.json').exists() else {}
+demos = {k: 'https://andyluu98.github.io/slidefly/gallery/' + v for k, v in demos.items()}
+demos['claude-ivory'] = 'demos/claude-co-gi-moi.html'
 index = (root / 'styles' / 'INDEX.md').read_text(encoding='utf8')
 out, group = [], ''
 for line in index.splitlines():
@@ -73,7 +78,8 @@ for line in index.splitlines():
     out.append({'name': cells[0], 'slug': slug, 'group': group, 'mood': cells[2], 'use': cells[3],
                 'fonts': cells[4], 'display': fonts[0], 'body': fonts[1] if len(fonts) > 1 else fonts[0],
                 'quote': quote.group(1) if quote else '', 'colors': [h for _, h in pairs][:6],
-                'bg': bg, 'fg': fg, 'accent': ac, 'accent2': ac2})
+                'bg': bg, 'fg': fg, 'accent': ac, 'accent2': ac2,
+                'shots': sum((shots / f'{slug}-{i}.jpg').exists() for i in (1, 2)), 'demo': demos.get(slug, '')})
 
 (root / 'docs').mkdir(exist_ok=True)
 (root / 'docs' / 'styles.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf8')

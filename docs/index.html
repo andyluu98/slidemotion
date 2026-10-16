@@ -59,6 +59,10 @@ pre .c{color:#9a8e7c}
 .st{background:var(--cream);border:2.5px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:5px 4px 0 var(--deep);display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s}
 .st:hover{transform:translateY(-3px);box-shadow:7px 6px 0 var(--orange)}
 .pv{position:relative;aspect-ratio:16/9;overflow:hidden;border-bottom:2.5px solid var(--ink);padding:14px 16px}
+.pv.shot{padding:0;display:block;background:#222}
+.pv.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .35s}
+.pv.shot img.alt{opacity:0}
+.st:hover .pv.shot img.alt{opacity:1}
 .pv .pk{display:block;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .pv .pt{display:block;font-size:25px;line-height:1.05;margin-top:7px;max-width:78%}
 .pv .bar{display:block;width:42px;height:5px;border-radius:3px;margin-top:9px}
@@ -74,8 +78,8 @@ pre .c{color:#9a8e7c}
 .st .s{font:500 12px var(--mono);color:var(--muted)}
 .st .md{font-size:13.5px;color:#3a2e26;margin-top:6px;line-height:1.45}
 .st .f{font-size:12px;color:var(--muted);margin-top:4px}
-.act{display:flex;gap:8px;margin-top:auto;padding-top:12px;flex-wrap:wrap}
-.act button,.act a{font:700 13px var(--body);padding:7px 11px;border:2px solid var(--ink);border-radius:9px;background:#fff;color:var(--ink);cursor:pointer;text-decoration:none;line-height:1.2}
+.act{display:flex;gap:6px;margin-top:auto;padding-top:12px;flex-wrap:wrap}
+.act button,.act a{font:700 12.5px var(--body);padding:6px 9px;border:2px solid var(--ink);border-radius:9px;background:#fff;color:var(--ink);cursor:pointer;text-decoration:none;line-height:1.2}
 .act button.p{background:var(--ink);color:var(--paper)}
 .act button:hover,.act a:hover{background:var(--mustard);color:var(--ink)}
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,120px);background:var(--ink);color:var(--paper);padding:12px 20px;border-radius:12px;font:600 15px var(--body);transition:transform .3s;z-index:9;max-width:90vw}
@@ -155,7 +159,7 @@ footer .card{box-shadow:6px 5px 0 var(--deep)}
     <p class="kick">Thư viện</p>
     <h2><em>86 style</em>, mỗi thẻ là cảm hứng chứ không là khuôn</h2>
     <p class="sub">Mỗi thẻ ghi bảng màu, phông chữ, ngôn ngữ minh họa, chữ ký chuyển động và khoảnh khắc đáng nhớ. Bố cục từng slide vẫn do AI tự nghĩ.</p>
-    <div class="how"><div><b>Chép lệnh</b>: câu lệnh dán thẳng vào Claude Code đã cài SlideMotion, thay phần chủ đề là xong.</div><div><b>Chép thẻ</b>: nguyên thẻ style (màu, phông, minh họa, chuyển động), dán vào AI nào cũng được, kể cả chưa cài skill.</div></div>
+    <div class="how"><div><b>Chép lệnh</b>: câu lệnh dán thẳng vào Claude Code đã cài SlideMotion, thay phần chủ đề là xong.</div><div><b>Chép thẻ</b>: nguyên thẻ style (màu, phông, minh họa, chuyển động), dán vào AI nào cũng được, kể cả chưa cài skill.</div><div><b>Ảnh mẫu</b>: chụp từ deck demo của SlideFly, skill anh em dùng chung bộ style. Rê chuột xem slide thứ hai, bấm ảnh để mở cả deck.</div></div>
     <div class="filters"><span class="fb"></span><input id="q" type="search" placeholder="Tìm theo tên, cảm xúc, chủ đề..." aria-label="Tìm style"><span class="count" id="cnt"></span></div>
     <div class="gal" id="gal"></div>
   </section>
@@ -176,7 +180,7 @@ git clone https://github.com/andyluu98/slidemotion ~/.claude/skills/slidemotion<
   </div>
 </footer>
 
-<script src="styles.js?v=3"></script>
+<script src="styles.js?v=4"></script>
 <script src="assets/gsap.min.js"></script>
 <script src="assets/SplitText.min.js"></script>
 <script src="assets/ScrambleTextPlugin.min.js"></script>
@@ -205,17 +209,19 @@ git clone https://github.com/andyluu98/slidemotion ~/.claude/skills/slidemotion<
     document.head.append(l);
   };
   const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { loadFonts(S[+e.target.dataset.i]); io.unobserve(e.target); } }), { rootMargin: '300px' }) : null;
-  const tile = (st, i) => `<div class="st" data-i="${i}">
-    <div class="pv" style="background:${st.bg};color:${st.fg}">
+  const pv = st => st.shots ? `<a class="pv shot" href="${st.demo || GH + st.slug + '.md'}" target="_blank" rel="noopener" title="Xem deck demo"><img src="assets/styles/${st.slug}-1.jpg" alt="Slide mẫu style ${esc(st.name)}" loading="lazy" width="800" height="450">${st.shots > 1 ? `<img class="alt" src="assets/styles/${st.slug}-2.jpg" alt="" loading="lazy" width="800" height="450">` : ''}</a>`
+    : `<div class="pv" style="background:${st.bg};color:${st.fg}">
       <span class="pk" style="color:${st.accent};font-family:${fam(st.body)}">${esc(st.group)} · slide mẫu</span>
       <span class="pt" style="font-family:${fam(st.display)}">${esc(st.name)}</span>
       <span class="bar" style="background:${st.accent2}"></span>
       <span class="pb" style="font-family:${fam(st.body)}">${SAMPLE}</span>
       <i class="orb" style="background:${st.accent}"></i><i class="orb2" style="background:${st.accent2}"></i>
       <span class="dots">${st.colors.map(c => `<i style="background:${c}"></i>`).join('')}</span>
-    </div>
+    </div>`;
+  const tile = (st, i) => `<div class="st" data-i="${i}">
+    ${pv(st)}
     <div class="b"><div class="n">${esc(st.name)}</div><div class="s">${st.slug}</div><div class="md">${esc(st.mood)}</div><div class="f">${esc(st.fonts)}</div>
-      <div class="act"><button type="button" class="p" data-a="prompt">Chép lệnh</button><button type="button" data-a="card">Chép thẻ</button><a href="${GH}${st.slug}.md" target="_blank" rel="noopener">Xem thẻ</a></div></div></div>`;
+      <div class="act"><button type="button" class="p" data-a="prompt">Chép lệnh</button><button type="button" data-a="card">Chép thẻ</button>${st.demo ? `<a href="${st.demo}" target="_blank" rel="noopener">Xem demo</a>` : ''}<a href="${GH}${st.slug}.md" target="_blank" rel="noopener">Xem thẻ</a></div></div></div>`;
   const draw = () => {
     const k = q.value.trim().toLowerCase();
     const list = S.map((s, i) => [s, i]).filter(([s]) => (g === 'Tất cả' || s.group === g) && (!k || (s.name + s.slug + s.mood + s.use + s.fonts).toLowerCase().includes(k)));

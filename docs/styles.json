@@ -20,7 +20,9 @@
   "bg": "#0D1117",
   "fg": "#E6EDF3",
   "accent": "#39D353",
-  "accent2": "#79C0FF"
+  "accent2": "#79C0FF",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/07_demo-terminal-green.html"
  },
  {
   "name": "8-Bit Orbit",
@@ -43,7 +45,9 @@
   "bg": "#0A0E27",
   "fg": "#EEF1FA",
   "accent": "#F4D03F",
-  "accent2": "#5EDCF4"
+  "accent2": "#5EDCF4",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/08_demo-8-bit-orbit.html"
  },
  {
   "name": "Pink Script",
@@ -63,7 +67,9 @@
   "bg": "#060507",
   "fg": "#F5EDF1",
   "accent": "#ED3D8C",
-  "accent2": "#ED3D8C"
+  "accent2": "#ED3D8C",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/30_demo-pink-script.html"
  },
  {
   "name": "Dark Botanical",
@@ -86,7 +92,9 @@
   "bg": "#0F0F0F",
   "fg": "#E8E4DF",
   "accent": "#D4A574",
-  "accent2": "#E8B4B8"
+  "accent2": "#E8B4B8",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/45_demo-dark-botanical.html"
  },
  {
   "name": "Neon Cyber",
@@ -108,7 +116,9 @@
   "bg": "#0A0F1C",
   "fg": "#EAFCFF",
   "accent": "#00FFCC",
-  "accent2": "#FF00AA"
+  "accent2": "#FF00AA",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/46_demo-neon-cyber.html"
  },
  {
   "name": "Sơn mài",
@@ -131,7 +141,9 @@
   "bg": "#140C09",
   "fg": "#EDE3CF",
   "accent": "#C9A04A",
-  "accent2": "#8E1B12"
+  "accent2": "#8E1B12",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/48_demo-son-mai.html"
  },
  {
   "name": "Aurora",
@@ -154,7 +166,9 @@
   "bg": "#0B0B14",
   "fg": "#F4F4F8",
   "accent": "#7C3AED",
-  "accent2": "#2DD4BF"
+  "accent2": "#2DD4BF",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/51_demo-aurora.html"
  },
  {
   "name": "Art Deco",
@@ -176,7 +190,9 @@
   "bg": "#0E1A17",
   "fg": "#F4ECD8",
   "accent": "#D4AF37",
-  "accent2": "#12392F"
+  "accent2": "#12392F",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/56_demo-art-deco.html"
  },
  {
   "name": "Keynote nền tối",
@@ -199,7 +215,9 @@
   "bg": "#07080C",
   "fg": "#EDF0F7",
   "accent": "#B7F34A",
-  "accent2": "#8791A5"
+  "accent2": "#8791A5",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/66_demo-dark-keynote.html"
  },
  {
   "name": "HUD hologram",
@@ -222,7 +240,9 @@
   "bg": "#04111A",
   "fg": "#DFFCF8",
   "accent": "#EAFFFD",
-  "accent2": "#FF9A2E"
+  "accent2": "#FF9A2E",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/67_demo-hologram-hud.html"
  },
  {
   "name": "Kính màu",
@@ -245,7 +265,9 @@
   "bg": "#1B1511",
   "fg": "#F3E7C9",
   "accent": "#E6AE2E",
-  "accent2": "#F6CC5A"
+  "accent2": "#F6CC5A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/74_demo-stained-glass.html"
  },
  {
   "name": "Sơn dầu impasto",
@@ -268,7 +290,9 @@
   "bg": "#211914",
   "fg": "#F3E7D0",
   "accent": "#F2B632",
-  "accent2": "#E8963C"
+  "accent2": "#E8963C",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/77_demo-impasto.html"
  },
  {
   "name": "Đèn lồng giấy",
@@ -291,7 +315,9 @@
   "bg": "#0B1232",
   "fg": "#FFF3D6",
   "accent": "#FF9A3A",
-  "accent2": "#D6401F"
+  "accent2": "#D6401F",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/82_demo-den-long-giay.html"
  },
  {
   "name": "Pixel RPG",
@@ -314,7 +340,9 @@
   "bg": "#1F5A44",
   "fg": "#F4F4F4",
   "accent": "#FFCD75",
-  "accent2": "#29366F"
+  "accent2": "#29366F",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/86_demo-pixel-rpg.html"
  },
  {
   "name": "HD-2D",
@@ -336,7 +364,9 @@
   "bg": "#2B2A66",
   "fg": "#F6ECD6",
   "accent": "#E8C27A",
-  "accent2": "#D8CFB6"
+  "accent2": "#D8CFB6",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/87_demo-hd-2d.html"
  },
  {
   "name": "Anime 80s",
@@ -359,7 +389,9 @@
   "bg": "#1A0D40",
   "fg": "#FFF0D9",
   "accent": "#FF4FA3",
-  "accent2": "#FFC857"
+  "accent2": "#FFC857",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/91_demo-cel-anime-80s.html"
  },
  {
   "name": "Pastel Geometry",
@@ -382,7 +414,9 @@
   "bg": "#C8D9E6",
   "fg": "#1F2A37",
   "accent": "#6C5AA3",
-  "accent2": "#7C6AAD"
+  "accent2": "#7C6AAD",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/04_demo-pastel-geometry.html"
  },
  {
   "name": "Split Pastel",
@@ -405,7 +439,9 @@
   "bg": "#F5E6DC",
   "fg": "#1A1A1A",
   "accent": "#6A4C9C",
-  "accent2": "#574E5C"
+  "accent2": "#574E5C",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/05_demo-split-pastel.html"
  },
  {
   "name": "Biennale Vàng",
@@ -426,7 +462,9 @@
   "bg": "#E9E5DB",
   "fg": "#1B2566",
   "accent": "#3A427A",
-  "accent2": "#3A427A"
+  "accent2": "#3A427A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/09_demo-biennale-yellow.html"
  },
  {
   "name": "Block Frame",
@@ -449,7 +487,9 @@
   "bg": "#FFFDF5",
   "fg": "#000000",
   "accent": "#FE90E8",
-  "accent2": "#F7CB46"
+  "accent2": "#F7CB46",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/10_demo-block-frame.html"
  },
  {
   "name": "Blue Professional",
@@ -470,7 +510,9 @@
   "bg": "#FDFAE7",
   "fg": "#111111",
   "accent": "#1E2BFA",
-  "accent2": "#6B6B6B"
+  "accent2": "#6B6B6B",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/11_demo-blue-professional.html"
  },
  {
   "name": "Capsule",
@@ -493,7 +535,9 @@
   "bg": "#F5F5F0",
   "fg": "#1A1A1A",
   "accent": "#E85D4E",
-  "accent2": "#C4D94E"
+  "accent2": "#C4D94E",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/14_demo-capsule.html"
  },
  {
   "name": "Cobalt Grid",
@@ -513,7 +557,9 @@
   "bg": "#F0EBDE",
   "fg": "#1F2BE0",
   "accent": "#5560E5",
-  "accent2": "#5560E5"
+  "accent2": "#5560E5",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/16_demo-cobalt-grid.html"
  },
  {
   "name": "Creative Mode",
@@ -536,7 +582,9 @@
   "bg": "#EFE9D9",
   "fg": "#0F0F0F",
   "accent": "#E85A1F",
-  "accent2": "#F06CA8"
+  "accent2": "#F06CA8",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/18_demo-creative-mode.html"
  },
  {
   "name": "Daisy Days",
@@ -559,7 +607,9 @@
   "bg": "#F5F0E6",
   "fg": "#2D2D2D",
   "accent": "#F8635F",
-  "accent2": "#7ECDC0"
+  "accent2": "#7ECDC0",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/19_demo-daisy-days.html"
  },
  {
   "name": "Long Table",
@@ -581,7 +631,9 @@
   "bg": "#FAF1E2",
   "fg": "#B53D2A",
   "accent": "#C05440",
-  "accent2": "#8E2D1F"
+  "accent2": "#8E2D1F",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/24_demo-long-table.html"
  },
  {
   "name": "Monochrome",
@@ -603,7 +655,9 @@
   "bg": "#FAFADF",
   "fg": "#1A1A16",
   "accent": "#5E5E54",
-  "accent2": "#8A8A80"
+  "accent2": "#8A8A80",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/26_demo-monochrome.html"
  },
  {
   "name": "Neo-Grid Bold",
@@ -626,7 +680,9 @@
   "bg": "#ECECE8",
   "fg": "#0A0A0A",
   "accent": "#4F4F4B",
-  "accent2": "#1A1A1A"
+  "accent2": "#1A1A1A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/27_demo-neo-grid-bold.html"
  },
  {
   "name": "Playful",
@@ -648,7 +704,9 @@
   "bg": "#F0C8A0",
   "fg": "#1A1A1A",
   "accent": "#4A3A2E",
-  "accent2": "#4A3A2E"
+  "accent2": "#4A3A2E",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/31_demo-playful.html"
  },
  {
   "name": "Raw Grid",
@@ -670,7 +728,9 @@
   "bg": "#FFFFFF",
   "fg": "#0A0A0A",
   "accent": "#333333",
-  "accent2": "#333333"
+  "accent2": "#333333",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/32_demo-raw-grid.html"
  },
  {
   "name": "Retro Windows",
@@ -693,7 +753,9 @@
   "bg": "#FFFFFF",
   "fg": "#222222",
   "accent": "#1084D0",
-  "accent2": "#008080"
+  "accent2": "#008080",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/33_demo-retro-windows.html"
  },
  {
   "name": "Retro Zine",
@@ -716,7 +778,9 @@
   "bg": "#C8B99A",
   "fg": "#1A1A1A",
   "accent": "#005C33",
-  "accent2": "#00A85D"
+  "accent2": "#00A85D",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/34_demo-retro-zine.html"
  },
  {
   "name": "Sakura Chroma",
@@ -739,7 +803,9 @@
   "bg": "#F1E6CB",
   "fg": "#3A2516",
   "accent": "#F09131",
-  "accent2": "#F0BC2A"
+  "accent2": "#F0BC2A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/35_demo-sakura-chroma.html"
  },
  {
   "name": "Scatterbrain",
@@ -762,7 +828,9 @@
   "bg": "#F7F5F0",
   "fg": "#2D2A26",
   "accent": "#C92A2A",
-  "accent2": "#C69C6D"
+  "accent2": "#C69C6D",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/36_demo-scatterbrain.html"
  },
  {
   "name": "Claude Ivory",
@@ -785,7 +853,9 @@
   "bg": "#FAF9F5",
   "fg": "#141413",
   "accent": "#B85433",
-  "accent2": "#D97757"
+  "accent2": "#D97757",
+  "shots": 2,
+  "demo": "demos/claude-co-gi-moi.html"
  },
  {
   "name": "Soft Editorial",
@@ -808,7 +878,9 @@
   "bg": "#F2EEDF",
   "fg": "#2A241B",
   "accent": "#E1A4C2",
-  "accent2": "#B7C7A8"
+  "accent2": "#B7C7A8",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/38_demo-soft-editorial.html"
  },
  {
   "name": "Swiss Modern",
@@ -830,7 +902,9 @@
   "bg": "#FFFFFF",
   "fg": "#0A0A0A",
   "accent": "#FF3300",
-  "accent2": "#555555"
+  "accent2": "#555555",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/42_demo-swiss-modern.html"
  },
  {
   "name": "Xanh Đại Học",
@@ -853,7 +927,9 @@
   "bg": "#F7FCFF",
   "fg": "#0D2B4E",
   "accent": "#0288D1",
-  "accent2": "#03A9F4"
+  "accent2": "#03A9F4",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/43_demo-xanh-dai-hoc.html"
  },
  {
   "name": "Paper & Ink",
@@ -875,7 +951,9 @@
   "bg": "#FAF9F7",
   "fg": "#1A1A1A",
   "accent": "#C41E3A",
-  "accent2": "#5C5650"
+  "accent2": "#5C5650",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/47_demo-paper-ink.html"
  },
  {
   "name": "Tranh Đông Hồ",
@@ -898,7 +976,9 @@
   "bg": "#EFE3C8",
   "fg": "#1E1A16",
   "accent": "#C98A2B",
-  "accent2": "#B23A2A"
+  "accent2": "#B23A2A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/49_demo-dong-ho.html"
  },
  {
   "name": "Hội An",
@@ -921,7 +1001,9 @@
   "bg": "#F4E3B0",
   "fg": "#3A2412",
   "accent": "#A5301F",
-  "accent2": "#E2563F"
+  "accent2": "#E2563F",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/50_demo-hoi-an.html"
  },
  {
   "name": "Bento Light",
@@ -944,7 +1026,9 @@
   "bg": "#F5F5F7",
   "fg": "#1D1D1F",
   "accent": "#0071E3",
-  "accent2": "#6E6E73"
+  "accent2": "#6E6E73",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/52_demo-bento-light.html"
  },
  {
   "name": "Bauhaus",
@@ -967,7 +1051,9 @@
   "bg": "#F2EBDD",
   "fg": "#111111",
   "accent": "#D7263D",
-  "accent2": "#F2B705"
+  "accent2": "#F2B705",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/53_demo-bauhaus.html"
  },
  {
   "name": "Restorative",
@@ -990,7 +1076,9 @@
   "bg": "#F3EDE4",
   "fg": "#2F2A28",
   "accent": "#0F8B8D",
-  "accent2": "#8A5A44"
+  "accent2": "#8A5A44",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/54_demo-restorative.html"
  },
  {
   "name": "Wabi",
@@ -1012,7 +1100,9 @@
   "bg": "#F4F1EA",
   "fg": "#1F1F1F",
   "accent": "#C8102E",
-  "accent2": "#6F6C66"
+  "accent2": "#6F6C66",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/55_demo-wabi.html"
  },
  {
   "name": "Clay 3D",
@@ -1035,7 +1125,9 @@
   "bg": "#EDE9FE",
   "fg": "#2E2257",
   "accent": "#7C3AED",
-  "accent2": "#FDA4AF"
+  "accent2": "#FDA4AF",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/57_demo-clay-3d.html"
  },
  {
   "name": "Thủy mặc",
@@ -1057,7 +1149,9 @@
   "bg": "#F2ECDE",
   "fg": "#1B1A17",
   "accent": "#B02E22",
-  "accent2": "#6A645A"
+  "accent2": "#6A645A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/59_demo-thuy-mac.html"
  },
  {
   "name": "Màu nước",
@@ -1080,7 +1174,9 @@
   "bg": "#F3ECDD",
   "fg": "#2F2922",
   "accent": "#B23F27",
-  "accent2": "#C2462B"
+  "accent2": "#C2462B",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/60_demo-mau-nuoc.html"
  },
  {
   "name": "Infographic isometric",
@@ -1103,7 +1199,9 @@
   "bg": "#FFFFFF",
   "fg": "#22263A",
   "accent": "#2B67AD",
-  "accent2": "#E5A93A"
+  "accent2": "#E5A93A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/61_demo-iso-infographic.html"
  },
  {
   "name": "Risograph",
@@ -1126,7 +1224,9 @@
   "bg": "#F4EEE2",
   "fg": "#2B2140",
   "accent": "#FF5E3A",
-  "accent2": "#0078BF"
+  "accent2": "#0078BF",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/62_demo-risograph.html"
  },
  {
   "name": "Cắt giấy đỏ",
@@ -1149,7 +1249,9 @@
   "bg": "#F4E7CD",
   "fg": "#3D1411",
   "accent": "#C8201E",
-  "accent2": "#D9A534"
+  "accent2": "#D9A534",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/63_demo-cat-giay-do.html"
  },
  {
   "name": "Bảng trắng",
@@ -1172,7 +1274,9 @@
   "bg": "#F4F4EF",
   "fg": "#23262C",
   "accent": "#B5502B",
-  "accent2": "#2A5CB3"
+  "accent2": "#2A5CB3",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/64_demo-whiteboard.html"
  },
  {
   "name": "Kể chuyện số liệu",
@@ -1195,7 +1299,9 @@
   "bg": "#F4EEDF",
   "fg": "#2A2621",
   "accent": "#B2182B",
-  "accent2": "#EF8A62"
+  "accent2": "#EF8A62",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/65_demo-dataviz.html"
  },
  {
   "name": "Tranh khắc đồng",
@@ -1218,7 +1324,9 @@
   "bg": "#F1E8D2",
   "fg": "#1C1510",
   "accent": "#C98A2E",
-  "accent2": "#7F3023"
+  "accent2": "#7F3023",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/70_demo-engraving.html"
  },
  {
   "name": "Poster in lụa",
@@ -1241,7 +1349,9 @@
   "bg": "#F4E9D0",
   "fg": "#1E3B3F",
   "accent": "#E8553D",
-  "accent2": "#B83A22"
+  "accent2": "#B83A22",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/73_demo-silkscreen-poster.html"
  },
  {
   "name": "Sách tranh sáp màu",
@@ -1264,7 +1374,9 @@
   "bg": "#F4EFE3",
   "fg": "#2A2850",
   "accent": "#EE8A2E",
-  "accent2": "#F2B632"
+  "accent2": "#F2B632",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/76_demo-crayon-book.html"
  },
  {
   "name": "Vẽ một nét",
@@ -1285,7 +1397,9 @@
   "bg": "#F8F5EE",
   "fg": "#1D1A17",
   "accent": "#C4372B",
-  "accent2": "#6B645A"
+  "accent2": "#6B645A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/78_demo-one-line.html"
  },
  {
   "name": "Ký họa đô thị",
@@ -1308,7 +1422,9 @@
   "bg": "#F3EAD6",
   "fg": "#3B2E25",
   "accent": "#9C3826",
-  "accent2": "#C8452F"
+  "accent2": "#C8452F",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/79_demo-urban-sketch.html"
  },
  {
   "name": "Sách pop-up giấy",
@@ -1331,7 +1447,9 @@
   "bg": "#FBF1DA",
   "fg": "#4A2E1B",
   "accent": "#A82A18",
-  "accent2": "#F59E0B"
+  "accent2": "#F59E0B",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/81_demo-paper-popup.html"
  },
  {
   "name": "Múa rối bóng",
@@ -1354,7 +1472,9 @@
   "bg": "#F0A850",
   "fg": "#26110A",
   "accent": "#8A2410",
-  "accent2": "#FFE9B8"
+  "accent2": "#FFE9B8",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/83_demo-roi-bong.html"
  },
  {
   "name": "Đồ chơi lắp ghép",
@@ -1377,7 +1497,9 @@
   "bg": "#E3EBF2",
   "fg": "#1B2A34",
   "accent": "#C91A09",
-  "accent2": "#0055BF"
+  "accent2": "#0055BF",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/84_demo-brick-toy.html"
  },
  {
   "name": "Hoạt hình giữa thế kỷ",
@@ -1400,7 +1522,9 @@
   "bg": "#F5EAD0",
   "fg": "#261D18",
   "accent": "#B2441A",
-  "accent2": "#E4682A"
+  "accent2": "#E4682A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/88_demo-midcentury-toon.html"
  },
  {
   "name": "Rubber hose 1930",
@@ -1423,7 +1547,9 @@
   "bg": "#EBE4D1",
   "fg": "#151413",
   "accent": "#A9A397",
-  "accent2": "#BDB6A6"
+  "accent2": "#BDB6A6",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/89_demo-rubber-hose.html"
  },
  {
   "name": "Creative Voltage",
@@ -1446,7 +1572,9 @@
   "bg": "#1A1A2E",
   "fg": "#FFFFFF",
   "accent": "#0066FF",
-  "accent2": "#D4FF00"
+  "accent2": "#D4FF00",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/02_demo-creative-voltage.html"
  },
  {
   "name": "Notebook Tabs",
@@ -1469,7 +1597,9 @@
   "bg": "#2D2D2D",
   "fg": "#F8F6F1",
   "accent": "#5A3E9B",
-  "accent2": "#FFE6A7"
+  "accent2": "#FFE6A7",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/03_demo-notebook-tabs.html"
  },
  {
   "name": "Vintage Editorial",
@@ -1492,7 +1622,9 @@
   "bg": "#F5F3EE",
   "fg": "#1A1A1A",
   "accent": "#9C5B3A",
-  "accent2": "#555555"
+  "accent2": "#555555",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/06_demo-vintage-editorial.html"
  },
  {
   "name": "Bold Poster",
@@ -1514,7 +1646,9 @@
   "bg": "#FFFFFF",
   "fg": "#1C1410",
   "accent": "#D8000F",
-  "accent2": "#5E5049"
+  "accent2": "#5E5049",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/12_demo-bold-poster.html"
  },
  {
   "name": "Broadside",
@@ -1537,7 +1671,9 @@
   "bg": "#111111",
   "fg": "#F0ECE5",
   "accent": "#E85D26",
-  "accent2": "#888880"
+  "accent2": "#888880",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/13_demo-broadside.html"
  },
  {
   "name": "Coral",
@@ -1559,7 +1695,9 @@
   "bg": "#F5F0E8",
   "fg": "#1A1A1A",
   "accent": "#E85D5D",
-  "accent2": "#6B6B6B"
+  "accent2": "#6B6B6B",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/17_demo-coral.html"
  },
  {
   "name": "Editorial Forest",
@@ -1582,7 +1720,9 @@
   "bg": "#EFE7D4",
   "fg": "#1A1A17",
   "accent": "#D27E96",
-  "accent2": "#E89CB1"
+  "accent2": "#E89CB1",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/20_demo-editorial-forest.html"
  },
  {
   "name": "Editorial Tri-Tone",
@@ -1602,7 +1742,9 @@
   "bg": "#F2D86A",
   "fg": "#7A1F35",
   "accent": "#F2B6C6",
-  "accent2": "#F2B6C6"
+  "accent2": "#F2B6C6",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/21_demo-editorial-tri-tone.html"
  },
  {
   "name": "Emerald Editorial",
@@ -1623,7 +1765,9 @@
   "bg": "#F1E9D6",
   "fg": "#0F1A5C",
   "accent": "#1B2774",
-  "accent2": "#3CD896"
+  "accent2": "#3CD896",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/22_demo-emerald-editorial.html"
  },
  {
   "name": "Grove",
@@ -1646,7 +1790,9 @@
   "bg": "#192B1B",
   "fg": "#E8E4D6",
   "accent": "#CF5A50",
-  "accent2": "#C8524A"
+  "accent2": "#C8524A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/23_demo-grove.html"
  },
  {
   "name": "People's Platform",
@@ -1669,7 +1815,9 @@
   "bg": "#F5F2EA",
   "fg": "#0E0E14",
   "accent": "#E83A2A",
-  "accent2": "#F2A03A"
+  "accent2": "#F2A03A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/28_demo-peoples-platform.html"
  },
  {
   "name": "Signal",
@@ -1692,7 +1840,9 @@
   "bg": "#1C2644",
   "fg": "#E2DCD0",
   "accent": "#93733A",
-  "accent2": "#C8A870"
+  "accent2": "#C8A870",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/37_demo-signal.html"
  },
  {
   "name": "Stencil & Tablet",
@@ -1715,7 +1865,9 @@
   "bg": "#F4EFE0",
   "fg": "#0A0A0A",
   "accent": "#EE7A2E",
-  "accent2": "#D8A93B"
+  "accent2": "#D8A93B",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/39_demo-stencil-tablet.html"
  },
  {
   "name": "Studio",
@@ -1735,7 +1887,9 @@
   "bg": "#1C1C1C",
   "fg": "#F5D200",
   "accent": "#242422",
-  "accent2": "#242422"
+  "accent2": "#242422",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/40_demo-studio.html"
  },
  {
   "name": "Blueprint",
@@ -1757,7 +1911,9 @@
   "bg": "#1F4386",
   "fg": "#E7F0F9",
   "accent": "#D7392B",
-  "accent2": "#0F2350"
+  "accent2": "#0F2350",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/58_demo-blueprint.html"
  },
  {
   "name": "Pictogram",
@@ -1780,7 +1936,9 @@
   "bg": "#1B1712",
   "fg": "#F7F0DE",
   "accent": "#F5B90A",
-  "accent2": "#BF3620"
+  "accent2": "#BF3620",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/68_demo-pictogram.html"
  },
  {
   "name": "Điệp viên 60s",
@@ -1801,7 +1959,9 @@
   "bg": "#1B1714",
   "fg": "#EFE4C9",
   "accent": "#E2A52A",
-  "accent2": "#D23A22"
+  "accent2": "#D23A22",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/69_demo-spy-titles.html"
  },
  {
   "name": "Tranh khắc gỗ",
@@ -1824,7 +1984,9 @@
   "bg": "#EFE5D0",
   "fg": "#14110D",
   "accent": "#9C3416",
-  "accent2": "#F2793A"
+  "accent2": "#F2793A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/71_demo-woodcut.html"
  },
  {
   "name": "Hồ sơ halftone",
@@ -1847,7 +2009,9 @@
   "bg": "#F3E9CF",
   "fg": "#1B2144",
   "accent": "#D6352C",
-  "accent2": "#EE4A86"
+  "accent2": "#EE4A86",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/72_demo-halftone-dossier.html"
  },
  {
   "name": "Phim câm",
@@ -1870,7 +2034,9 @@
   "bg": "#120A0A",
   "fg": "#F2EBDA",
   "accent": "#E3B96C",
-  "accent2": "#8F2A1A"
+  "accent2": "#8F2A1A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/75_demo-silent-film.html"
  },
  {
   "name": "Ukiyo-e",
@@ -1893,7 +2059,9 @@
   "bg": "#EBDDB8",
   "fg": "#211E1B",
   "accent": "#C23B2B",
-  "accent2": "#D2A24A"
+  "accent2": "#D2A24A",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/80_demo-ukiyoe.html"
  },
  {
   "name": "Game show",
@@ -1914,7 +2082,9 @@
   "bg": "#1B1035",
   "fg": "#FFF3D6",
   "accent": "#FFD23F",
-  "accent2": "#D4253F"
+  "accent2": "#D4253F",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/85_demo-game-show.html"
  },
  {
   "name": "Hoạt hình viễn tưởng",
@@ -1936,6 +2106,8 @@
   "bg": "#FFF6C9",
   "fg": "#2A1D3A",
   "accent": "#912A07",
-  "accent2": "#4A3A62"
+  "accent2": "#4A3A62",
+  "shots": 2,
+  "demo": "https://andyluu98.github.io/slidefly/gallery/90_demo-scifi-toon.html"
  }
 ]
