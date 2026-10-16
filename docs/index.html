@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SlideMotion: AI làm đạo diễn cho slide của bạn</title>
+<meta name="description" content="Skill cho Claude Code: gõ chủ đề, AI tự thiết kế từng slide với 86 style và chuyển động GSAP. Không khung dựng sẵn.">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F5EAD0;--deep:#EBD9B2;--cream:#FBF3DC;--ink:#261D18;--orange:#E4682A;--accent:#B2441A;--teal:#1F9C96;--teal-deep:#0F6B68;--mustard:#F2B63D;--muted:#5A4A3E;--slab:'Alfa Slab One',serif;--body:'Be Vietnam Pro',sans-serif;--mono:'JetBrains Mono',monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 18px/1.6 var(--body);overflow-x:hidden}
+a{color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.sun{position:absolute;border-radius:50%;background:repeating-conic-gradient(rgba(242,182,61,.5) 0 7deg,transparent 7deg 18deg);-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);pointer-events:none;animation:spin 120s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+header{position:relative;overflow:hidden;padding:72px 0 0;min-height:640px}
+.kick{font:700 14px var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--teal-deep);margin:0}
+h1{font:400 clamp(56px,10vw,128px)/1 var(--slab);margin:14px 0 0;letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--orange)}
+.tag{font:400 clamp(22px,3vw,34px)/1.25 var(--slab);color:var(--accent);margin:22px 0 0;max-width:760px}
+.lead{font-size:clamp(17px,2vw,20px);max-width:680px;color:#3a2e26;margin:18px 0 0}
+.btns{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
+.btn{display:inline-block;padding:14px 24px;border:3px solid var(--ink);border-radius:14px;background:var(--cream);box-shadow:6px 5px 0 var(--orange);font:700 17px var(--body);color:var(--ink);text-decoration:none;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:8px 7px 0 var(--orange)}
+.btn.t{box-shadow:6px 5px 0 var(--teal)}
+.belt{position:relative;height:170px;margin-top:56px}
+.belt svg{position:absolute;left:0;bottom:0;width:100%;height:120px}
+.floor{position:absolute;left:0;right:0;bottom:0;height:46px;background:var(--deep);border-top:4px solid var(--ink)}
+.tile{position:absolute;bottom:62px;padding:8px 14px;background:var(--cream);border:3px solid var(--ink);border-radius:10px;box-shadow:5px 4px 0 var(--orange);font:600 18px var(--body);white-space:nowrap}
+section{padding:84px 0 0}
+h2{font:400 clamp(32px,5vw,52px)/1.1 var(--slab);margin:10px 0 0}
+h2 em{font-style:normal;color:var(--accent)}
+.sub{color:var(--muted);max-width:720px;margin:14px 0 0}
+.grid{display:grid;gap:22px;margin-top:36px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.card{background:var(--cream);border:3px solid var(--ink);border-radius:18px;box-shadow:8px 7px 0 var(--teal);padding:24px}
+.card.m{box-shadow:8px 7px 0 var(--mustard)}.card.o{box-shadow:8px 7px 0 var(--orange)}
+.card h3{font:400 24px/1.2 var(--slab);margin:0 0 8px}
+.card p{margin:0;color:#3a2e26}
+.vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;margin-top:36px}
+.vs .card ul{margin:8px 0 0;padding-left:20px}
+.demo{display:block;text-decoration:none;color:var(--ink);padding:0;overflow:hidden}
+.demo img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-bottom:3px solid var(--ink);background:var(--deep)}
+.demo div{padding:18px 20px}
+.steps{counter-reset:s;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:36px}
+.step{position:relative;padding:22px 22px 22px 78px;background:var(--cream);border:3px solid var(--ink);border-radius:16px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;left:18px;top:18px;width:44px;height:44px;border-radius:50%;background:var(--orange);border:3px solid var(--ink);color:var(--cream);font:400 22px/38px var(--slab);text-align:center}
+.step b{display:block;font:400 19px var(--slab);margin-bottom:4px}
+code,pre{font-family:var(--mono)}
+pre{background:var(--ink);color:#F5EAD0;border-radius:16px;padding:20px 24px;overflow-x:auto;font-size:15px;line-height:1.7;margin:24px 0 0}
+pre .c{color:#9a8e7c}
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;align-items:center}
+.filters button{font:600 15px var(--body);padding:8px 16px;border:2.5px solid var(--ink);border-radius:99px;background:var(--cream);cursor:pointer;color:var(--ink)}
+.filters button.on{background:var(--ink);color:var(--paper)}
+.filters input{font:500 15px var(--body);padding:9px 16px;border:2.5px solid var(--ink);border-radius:99px;background:#fff;min-width:220px;flex:1;max-width:340px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:22px}
+.st{background:var(--cream);border:2.5px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:5px 4px 0 var(--deep);transition:transform .15s}
+.st:hover{transform:translateY(-3px)}
+.sw{display:flex;height:64px;border-bottom:2.5px solid var(--ink)}
+.sw i{flex:1}
+.st .b{padding:12px 14px}
+.st .n{font:400 17px var(--slab)}
+.st .s{font:500 12px var(--mono);color:var(--muted)}
+.st .md{font-size:13.5px;color:#3a2e26;margin-top:6px;line-height:1.45}
+.st .f{font-size:12px;color:var(--muted);margin-top:6px}
+.count{font:600 15px var(--body);color:var(--muted)}
+footer{padding:80px 0 60px;color:var(--muted);font-size:15px}
+footer .card{box-shadow:6px 5px 0 var(--deep)}
+@media (max-width:640px){header{padding-top:48px}.belt{height:140px}.step{padding-left:70px}}
+@media (prefers-reduced-motion:reduce){.sun{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="sun" style="width:900px;height:900px;right:-260px;top:-260px"></div>
+  <div class="wrap" style="position:relative">
+    <p class="kick hk">Skill cho Claude Code · mã nguồn mở</p>
+    <h1 class="ht">Slide<em>Motion</em></h1>
+    <p class="tag">Gõ chủ đề, AI làm đạo diễn, ra deck có hồn.</p>
+    <p class="lead">Không khung dựng sẵn, không slide nào giống slide nào. SlideMotion đưa cho AI một cuốn sách phong cách 86 style, một từ điển chuyển động và một runtime GSAP nhỏ. AI tự nghĩ câu chuyện, tự vẽ hình, tự dàn dựng từng chuyển động.</p>
+    <div class="btns"><a class="btn" href="#demo">Xem deck mẫu</a><a class="btn t" href="#cai-dat">Cài vào Claude Code</a><a class="btn t" href="#style">86 style</a></div>
+  </div>
+  <div class="belt">
+    <svg viewBox="0 0 1600 120" preserveAspectRatio="none"><path class="bl" d="M0 60H1600M0 92H1600" stroke="#261D18" stroke-width="4" stroke-dasharray="40 20"/></svg>
+    <div class="floor"></div>
+    <div class="tiles"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="kick">Vì sao có SlideMotion</p>
+    <h2>Khung cứng làm AI <em>rập khuôn</em></h2>
+    <p class="sub">Mô hình bây giờ đủ giỏi để tự thiết kế. Ép nó điền nội dung vào khuôn thì deck nào cũng một dáng, một kiểu hiện. Thứ nó cần là gu, không phải khuôn.</p>
+    <div class="vs">
+      <div class="card o"><h3>Cách cũ: lắp ghép khung</h3><ul><li>Kiểu slide định sẵn: tiêu đề trái, gạch đầu dòng, ô nhấn phải</li><li>Hiệu ứng chỉ để trang trí, mọi thứ cùng trượt lên</li><li>Đổi chủ đề mà nhìn vẫn như nhau</li></ul></div>
+      <div class="card"><h3>SlideMotion: AI làm đạo diễn</h3><ul><li>Mỗi deck một ý tưởng lớn: một thế giới, một nhân vật đi suốt bài</li><li>Hình ẩn dụ lấy từ chính chủ đề, vẽ bằng SVG</li><li>Chuyển động theo động từ của câu: "cắt" thì cắt, "gom" thì gom</li></ul></div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <p class="kick">Deck mẫu</p>
+    <h2>Bấm vào, <em>bấm Space</em> để xem từng bước</h2>
+    <p class="sub">Mỗi deck là một file HTML, chiếu offline được. Mũi tên hoặc Space để chuyển, F toàn màn hình, Ctrl+P ra bản phát tay.</p>
+    <div class="grid g3">
+      <a class="card demo" href="demos/nha-may-chu-gsap.html"><img src="assets/thumb-nha-may-chu.jpg" alt="Deck nhà máy chữ" loading="lazy"><div><h3>Nhà máy chữ</h3><p>Bên trong một chatbot, phim giáo dục thập niên 50. Kéo cắt câu thành token, đường chú ý tự vẽ, núm nhiệt độ.</p></div></a>
+      <a class="card demo m" href="demos/claude-co-gi-moi.html"><img src="assets/thumb-claude.jpg" alt="Deck tính năng mới của Claude Code" loading="lazy"><div><h3>Có gì mới trong Claude Code</h3><p>19 slide style Claude Ivory. Ngôi sao mọc thêm một cánh sau mỗi tính năng.</p></div></a>
+      <a class="card demo o" href="demos/mot-ngay-o-cong-truong.html"><img src="assets/thumb-cong-truong.jpg" alt="Deck một ngày ở công trường" loading="lazy"><div><h3>Một ngày ở công trường</h3><p>AI trong xây dựng. Máy quay lia theo công trường, trời đổi từ sáng tới đêm.</p></div></a>
+    </div>
+  </section>
+
+  <section>
+    <p class="kick">Quy trình</p>
+    <h2>Sáu bước, <em>AI tự đi hết</em></h2>
+    <div class="steps">
+      <div class="step"><b>Chọn chế độ</b>Giảng dạy, báo cáo hay sự kiện. Mỗi chế độ một nhịp riêng.</div>
+      <div class="step"><b>Ý tưởng lớn</b>Một thế giới, một trục, một nhân vật đi suốt bài.</div>
+      <div class="step"><b>Chọn style</b>Gợi ý ba style từ 86 thẻ: hợp, khác nền, bất ngờ.</div>
+      <div class="step"><b>Kịch bản đạo diễn</b>Mỗi slide một ý, một hình ẩn dụ, một động từ chuyển động.</div>
+      <div class="step"><b>Dựng bằng GSAP</b>Mỗi slide một dòng thời gian; mỗi cú bấm chạy một đoạn, bấm lùi tua ngược.</div>
+      <div class="step"><b>Tự soát</b>Chụp từng khung hình, sửa chữ đè, kiểm nguồn số liệu trước khi giao.</div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kick">Ba chế độ</p>
+    <h2>Cùng một skill, <em>ba cách kể</em></h2>
+    <div class="grid g3">
+      <div class="card"><h3>Giảng dạy</h3><p>Câu chuyện xuyên suốt, bấm từng bước, định nghĩa, ví von, ví dụ, câu hỏi kiểm tra, slide tóm tắt, bản phát tay.</p></div>
+      <div class="card m"><h3>Báo cáo</h3><p>Kết luận trước, số liệu có nguồn cạnh từng con số, một biểu đồ một thông điệp, hiệu ứng nhẹ.</p></div>
+      <div class="card o"><h3>Sự kiện</h3><p>Ý tưởng điện ảnh, toàn cảnh lia, khoảnh khắc lớn cho bìa và kết.</p></div>
+    </div>
+  </section>
+
+  <section id="style">
+    <p class="kick">Thư viện</p>
+    <h2><em>86 style</em>, mỗi thẻ là cảm hứng chứ không là khuôn</h2>
+    <p class="sub">Mỗi thẻ ghi bảng màu, phông chữ, ngôn ngữ minh họa, chữ ký chuyển động và khoảnh khắc đáng nhớ. Bố cục từng slide vẫn do AI tự nghĩ.</p>
+    <div class="filters"><span class="fb"></span><input id="q" type="search" placeholder="Tìm theo tên, cảm xúc, chủ đề..." aria-label="Tìm style"><span class="count" id="cnt"></span></div>
+    <div class="gal" id="gal"></div>
+  </section>
+
+  <section id="cai-dat">
+    <p class="kick">Cài đặt</p>
+    <h2>Một lệnh, <em>rồi cứ nói</em></h2>
+    <pre><span class="c"># macOS, Linux, Git Bash trên Windows</span>
+git clone https://github.com/andyluu98/slidemotion ~/.claude/skills/slidemotion</pre>
+    <p class="sub">Rồi trong Claude Code: <code>làm slide 15 trang về an toàn lao động, style blueprint</code>. Claude tự nạp skill, hỏi chế độ, gợi ý style và dựng.</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div class="card">
+    <p><b>Giấy phép.</b> Mã và thẻ style của SlideMotion theo MIT. Thư viện GSAP trong <code>runtime/vendor/</code> theo giấy phép riêng của GSAP (gsap.com/standard-license), giữ nguyên phần ghi bản quyền trong file.</p>
+    <p style="margin-top:10px"><b>Ghi công.</b> Nhiều style phỏng theo MotionFly / lemo-opuscar (MIT) và frontend-slides (MIT). Style Claude Ivory phỏng theo nhận diện công khai của Claude; SlideMotion không liên kết với Anthropic.</p>
+  </div>
+</footer>
+
+<script src="styles.js"></script>
+<script src="assets/gsap.min.js"></script>
+<script src="assets/SplitText.min.js"></script>
+<script src="assets/ScrambleTextPlugin.min.js"></script>
+<script>
+/* thư viện style */
+(() => {
+  const S = window.STYLES || [], gal = document.getElementById('gal'), q = document.getElementById('q'), cnt = document.getElementById('cnt'), fb = document.querySelector('.fb');
+  const groups = ['Tất cả', ...new Set(S.map(s => s.group))];
+  let g = 'Tất cả';
+  fb.outerHTML = groups.map(x => `<button type="button" data-g="${x}" class="${x === g ? 'on' : ''}">${x}</button>`).join('');
+  const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const draw = () => {
+    const k = q.value.trim().toLowerCase();
+    const list = S.filter(s => (g === 'Tất cả' || s.group === g) && (!k || (s.name + s.slug + s.mood + s.use + s.fonts).toLowerCase().includes(k)));
+    cnt.textContent = list.length + ' style';
+    gal.innerHTML = list.map(s => `<div class="st" title="${esc(s.quote)}"><div class="sw">${s.colors.map(c => `<i style="background:${c}"></i>`).join('')}</div><div class="b"><div class="n">${esc(s.name)}</div><div class="s">${s.slug}</div><div class="md">${esc(s.mood)}</div><div class="f">${esc(s.fonts)}</div></div></div>`).join('');
+    if (window.gsap) gsap.from(gal.children, { y: 24, opacity: 0, duration: .45, stagger: .012, ease: 'power2.out' });
+  };
+  document.querySelector('.filters').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; g = b.dataset.g; document.querySelectorAll('.filters button').forEach(x => x.classList.toggle('on', x === b)); draw(); });
+  q.addEventListener('input', draw);
+  draw();
+})();
+/* băng chuyền đầu trang và tiêu đề */
+(() => {
+  const host = document.querySelector('.tiles'), words = ['Câu', 'hỏi', 'của', 'bạn', 'đi', 'đâu', '?', 'slide', 'có', 'hồn'];
+  host.innerHTML = words.map(w => `<span class="tile">${w}</span>`).join('');
+  if (!window.gsap || matchMedia('(prefers-reduced-motion: reduce)').matches) { [...host.children].forEach((t, i) => t.style.left = 4 + i * 9.5 + '%'); return; }
+  gsap.registerPlugin(SplitText, ScrambleTextPlugin);
+  gsap.from(SplitText.create('.ht', { type: 'chars' }).chars, { yPercent: 120, rotation: () => gsap.utils.random(-30, 30), opacity: 0, duration: .9, ease: 'back.out(2.2)', stagger: .05 });
+  gsap.from('.hk', { duration: 1, scrambleText: { text: ' ', chars: 'upperCase', speed: .6 } });
+  gsap.from(['.tag', '.lead', '.btns'], { y: 30, opacity: 0, duration: .7, ease: 'power3.out', stagger: .12, delay: .5 });
+  gsap.to('.bl', { strokeDashoffset: -60, duration: 1.4, repeat: -1, ease: 'none' });
+  const tiles = [...host.children], W = () => host.parentElement.clientWidth;
+  tiles.forEach((t, i) => {
+    const run = () => gsap.fromTo(t, { x: -160, y: 0, rotation: 0 }, { x: W() + 40, duration: 16, ease: 'none', onComplete: run });
+    gsap.delayedCall(i * 1.6, run);
+    gsap.to(t, { y: -10, duration: .5, yoyo: true, repeat: -1, ease: 'sine.inOut', delay: i * .13 });
+  });
+})();
+</script>
+</body>
+</html>
