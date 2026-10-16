@@ -2,7 +2,7 @@
 
 Chọn theo chủ đề và cảm xúc. Gợi ý 3 style cho người dùng: một **hợp**, một **khác nền**, một **bất ngờ**. Đọc thẻ `styles/<slug>.md` của style đã chọn trước khi dựng.
 
-Tổng 85 style. Mỗi style có một thẻ gợi ý ở cột "Thẻ".
+Tổng 86 style. Mỗi style có một thẻ gợi ý ở cột "Thẻ".
 
 ## Nền tối (16)
 
@@ -25,7 +25,7 @@ Tổng 85 style. Mỗi style có một thẻ gợi ý ở cột "Thẻ".
 | HD-2D | `hd-2d` | ấm áp, huyền ảo, ánh sáng, diorama | Trailer game, kể chuyện, giới thiệu thương hiệu, nội dung giả tưởng và hoài niệm | Cormorant + Cormorant Garamond | [có](hd-2d.md) |
 | Anime 80s | `cel-anime-80s` | hoài niệm, neon, hoàng hôn, thành phố đêm | Deck hoài niệm, trailer, MV, giới thiệu sản phẩm công nghệ phong cách retro, sự kiện âm nhạc | Barlow Condensed + Barlow | [có](cel-anime-80s.md) |
 
-## Nền sáng (46)
+## Nền sáng (47)
 
 | Style | Slug | Cảm xúc | Hợp với | Chữ | Thẻ |
 |---|---|---|---|---|---|
@@ -47,6 +47,7 @@ Tổng 85 style. Mỗi style có một thẻ gợi ý ở cột "Thẻ".
 | Retro Zine | `retro-zine` | thủ công, mộc mạc, hoài cổ, bụi bặm | Ấn phẩm độc lập, nghệ thuật, cộng đồng, chất in risograph | Oswald + Space Grotesk + Patrick Hand | [có](retro-zine.md) |
 | Sakura Chroma | `sakura-chroma` | hoài cổ, vui tươi, ấm áp, rực màu | Ra mắt sản phẩm sáng tạo, nhãn nhạc, tạp chí, workshop trẻ trung | Big Shoulders Display + Be Vietnam Pro + JetBrains Mono | [có](sakura-chroma.md) |
 | Scatterbrain | `scatterbrain` | vui tươi, sáng tạo, ấm áp, bừa có chủ ý | Workshop, brainstorm, đào tạo sáng tạo, buổi ý tưởng | Lobster + Roboto Slab + Patrick Hand | [có](scatterbrain.md) |
+| Claude Ivory | `claude-ivory` | điềm tĩnh, ấm, chín chắn, tin cậy | Giới thiệu Claude, Claude Code, đào tạo công cụ AI, agent và quy trình | Source Serif 4 + Be Vietnam Pro + JetBrains Mono | [có](claude-ivory.md) |
 | Soft Editorial | `soft-editorial` | văn chương, thanh lịch, tĩnh lặng, ấm áp | Tạp chí, câu chuyện thương hiệu, tư vấn, triển lãm | Cormorant Garamond + Work Sans | [có](soft-editorial.md) |
 | Swiss Modern | `swiss-modern` | rõ ràng, chuyên nghiệp, tối giản | Doanh nghiệp, đào tạo, báo cáo | Archivo + Inter | [có](swiss-modern.md) |
 | Xanh Đại Học | `xanh-dai-hoc` | trẻ, học thuật, thân thiện | Bảo vệ đề tài, bài giảng, báo cáo nhóm | Montserrat + Open Sans | [có](xanh-dai-hoc.md) |

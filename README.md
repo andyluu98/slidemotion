@@ -2,7 +2,7 @@
 
 **Gõ chủ đề, AI làm đạo diễn, ra deck có hồn.** Không khung dựng sẵn, không slide nào giống slide nào.
 
-SlideMotion là một skill cho Claude Code (và các agent đọc được SKILL.md): thay vì ép AI điền nội dung vào khuôn, nó đưa cho AI một cuốn sách phong cách gồm 85 style, một từ điển chuyển động, và một runtime nhỏ để chiếu. AI tự thiết kế từng slide: hình ẩn dụ đúng chủ đề, chuyển động đúng động từ của câu.
+SlideMotion là một skill cho Claude Code (và các agent đọc được SKILL.md): thay vì ép AI điền nội dung vào khuôn, nó đưa cho AI một cuốn sách phong cách gồm 86 style, một từ điển chuyển động, và một runtime nhỏ để chiếu. AI tự thiết kế từng slide: hình ẩn dụ đúng chủ đề, chuyển động đúng động từ của câu.
 
 ## Có gì trong repo
 
