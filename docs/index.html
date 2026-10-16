@@ -55,16 +55,31 @@ pre .c{color:#9a8e7c}
 .filters button{font:600 15px var(--body);padding:8px 16px;border:2.5px solid var(--ink);border-radius:99px;background:var(--cream);cursor:pointer;color:var(--ink)}
 .filters button.on{background:var(--ink);color:var(--paper)}
 .filters input{font:500 15px var(--body);padding:9px 16px;border:2.5px solid var(--ink);border-radius:99px;background:#fff;min-width:220px;flex:1;max-width:340px}
-.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:22px}
-.st{background:var(--cream);border:2.5px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:5px 4px 0 var(--deep);transition:transform .15s}
-.st:hover{transform:translateY(-3px)}
-.sw{display:flex;height:64px;border-bottom:2.5px solid var(--ink)}
-.sw i{flex:1}
-.st .b{padding:12px 14px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;margin-top:22px}
+.st{background:var(--cream);border:2.5px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:5px 4px 0 var(--deep);display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s}
+.st:hover{transform:translateY(-3px);box-shadow:7px 6px 0 var(--orange)}
+.pv{position:relative;aspect-ratio:16/9;overflow:hidden;border-bottom:2.5px solid var(--ink);padding:14px 16px}
+.pv .pk{display:block;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.pv .pt{display:block;font-size:25px;line-height:1.05;margin-top:7px;max-width:78%}
+.pv .bar{display:block;width:42px;height:5px;border-radius:3px;margin-top:9px}
+.pv .pb{display:block;font-size:11.5px;line-height:1.4;margin-top:8px;max-width:64%;opacity:.85}
+.pv .orb{position:absolute;right:-26px;bottom:-26px;width:108px;height:108px;border-radius:50%}
+.pv .orb2{position:absolute;right:58px;bottom:16px;width:26px;height:26px;border-radius:7px;transform:rotate(12deg)}
+.pv .dots{position:absolute;left:16px;bottom:12px;display:flex;gap:4px}
+.pv .dots i{width:11px;height:11px;border-radius:50%;box-shadow:0 0 0 1px rgba(127,127,127,.35)}
+.st .b{padding:12px 14px 14px;display:flex;flex-direction:column;flex:1}
 .st .n{font:400 17px var(--slab)}
 .st .s{font:500 12px var(--mono);color:var(--muted)}
 .st .md{font-size:13.5px;color:#3a2e26;margin-top:6px;line-height:1.45}
-.st .f{font-size:12px;color:var(--muted);margin-top:6px}
+.st .f{font-size:12px;color:var(--muted);margin-top:4px}
+.act{display:flex;gap:8px;margin-top:auto;padding-top:12px;flex-wrap:wrap}
+.act button,.act a{font:700 13px var(--body);padding:7px 11px;border:2px solid var(--ink);border-radius:9px;background:#fff;color:var(--ink);cursor:pointer;text-decoration:none;line-height:1.2}
+.act button.p{background:var(--ink);color:var(--paper)}
+.act button:hover,.act a:hover{background:var(--mustard);color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,120px);background:var(--ink);color:var(--paper);padding:12px 20px;border-radius:12px;font:600 15px var(--body);transition:transform .3s;z-index:9;max-width:90vw}
+.toast.on{transform:translate(-50%,0)}
+.how{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.how div{background:var(--cream);border:2px dashed var(--muted);border-radius:12px;padding:12px 16px;font-size:15px}
 .count{font:600 15px var(--body);color:var(--muted)}
 footer{padding:80px 0 60px;color:var(--muted);font-size:15px}
 footer .card{box-shadow:6px 5px 0 var(--deep)}
@@ -138,6 +153,7 @@ footer .card{box-shadow:6px 5px 0 var(--deep)}
     <p class="kick">Thư viện</p>
     <h2><em>86 style</em>, mỗi thẻ là cảm hứng chứ không là khuôn</h2>
     <p class="sub">Mỗi thẻ ghi bảng màu, phông chữ, ngôn ngữ minh họa, chữ ký chuyển động và khoảnh khắc đáng nhớ. Bố cục từng slide vẫn do AI tự nghĩ.</p>
+    <div class="how"><div><b>Chép lệnh</b>: câu lệnh dán thẳng vào Claude Code đã cài SlideMotion, thay phần chủ đề là xong.</div><div><b>Chép thẻ</b>: nguyên thẻ style (màu, phông, minh họa, chuyển động), dán vào AI nào cũng được, kể cả chưa cài skill.</div></div>
     <div class="filters"><span class="fb"></span><input id="q" type="search" placeholder="Tìm theo tên, cảm xúc, chủ đề..." aria-label="Tìm style"><span class="count" id="cnt"></span></div>
     <div class="gal" id="gal"></div>
   </section>
@@ -163,20 +179,68 @@ git clone https://github.com/andyluu98/slidemotion ~/.claude/skills/slidemotion<
 <script src="assets/SplitText.min.js"></script>
 <script src="assets/ScrambleTextPlugin.min.js"></script>
 <script>
-/* thư viện style */
+/* thư viện style: mỗi ô là một slide thu nhỏ vẽ bằng màu và phông thật của style */
 (() => {
   const S = window.STYLES || [], gal = document.getElementById('gal'), q = document.getElementById('q'), cnt = document.getElementById('cnt'), fb = document.querySelector('.fb');
+  const RAW = 'https://raw.githubusercontent.com/andyluu98/slidemotion/main/styles/', GH = 'https://github.com/andyluu98/slidemotion/blob/main/styles/';
+  const SAMPLE = 'Gõ chủ đề, AI làm đạo diễn.';
   const groups = ['Tất cả', ...new Set(S.map(s => s.group))];
   let g = 'Tất cả';
   fb.outerHTML = groups.map(x => `<button type="button" data-g="${x}" class="${x === g ? 'on' : ''}">${x}</button>`).join('');
-  const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const fam = f => `'${f.replace(/'/g, '')}'`;
+  // phông Google nạp khi ô sắp hiện ra, chỉ xin đúng các chữ cần vẽ
+  const loaded = new Set();
+  const glyphs = encodeURIComponent([...new Set((S.map(x => x.name + x.group).join('') + SAMPLE + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ·ỀẨẪẤẦẬ ').split(''))].join(''));
+  const loadFonts = st => {
+    const fs = [...new Set([st.display, st.body])].filter(f => !loaded.has(f));
+    if (!fs.length) return;
+    fs.forEach(f => loaded.add(f));
+    const l = document.createElement('link'); l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?' + fs.map(f => 'family=' + encodeURIComponent(f).replace(/%20/g, '+')).join('&') + '&display=swap&text=' + glyphs;
+    document.head.append(l);
+  };
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { loadFonts(S[+e.target.dataset.i]); io.unobserve(e.target); } }), { rootMargin: '300px' }) : null;
+  const tile = (st, i) => `<div class="st" data-i="${i}">
+    <div class="pv" style="background:${st.bg};color:${st.fg}">
+      <span class="pk" style="color:${st.accent};font-family:${fam(st.body)}">${esc(st.group)} · slide mẫu</span>
+      <span class="pt" style="font-family:${fam(st.display)}">${esc(st.name)}</span>
+      <span class="bar" style="background:${st.accent2}"></span>
+      <span class="pb" style="font-family:${fam(st.body)}">${SAMPLE}</span>
+      <i class="orb" style="background:${st.accent}"></i><i class="orb2" style="background:${st.accent2}"></i>
+      <span class="dots">${st.colors.map(c => `<i style="background:${c}"></i>`).join('')}</span>
+    </div>
+    <div class="b"><div class="n">${esc(st.name)}</div><div class="s">${st.slug}</div><div class="md">${esc(st.mood)}</div><div class="f">${esc(st.fonts)}</div>
+      <div class="act"><button type="button" class="p" data-a="prompt">Chép lệnh</button><button type="button" data-a="card">Chép thẻ</button><a href="${GH}${st.slug}.md" target="_blank" rel="noopener">Xem thẻ</a></div></div></div>`;
   const draw = () => {
     const k = q.value.trim().toLowerCase();
-    const list = S.filter(s => (g === 'Tất cả' || s.group === g) && (!k || (s.name + s.slug + s.mood + s.use + s.fonts).toLowerCase().includes(k)));
+    const list = S.map((s, i) => [s, i]).filter(([s]) => (g === 'Tất cả' || s.group === g) && (!k || (s.name + s.slug + s.mood + s.use + s.fonts).toLowerCase().includes(k)));
     cnt.textContent = list.length + ' style';
-    gal.innerHTML = list.map(s => `<div class="st" title="${esc(s.quote)}"><div class="sw">${s.colors.map(c => `<i style="background:${c}"></i>`).join('')}</div><div class="b"><div class="n">${esc(s.name)}</div><div class="s">${s.slug}</div><div class="md">${esc(s.mood)}</div><div class="f">${esc(s.fonts)}</div></div></div>`).join('');
-    if (window.gsap) gsap.from(gal.children, { y: 24, opacity: 0, duration: .45, stagger: .012, ease: 'power2.out' });
+    gal.innerHTML = list.map(([s, i]) => tile(s, i)).join('');
+    gal.querySelectorAll('.st').forEach(el => io ? io.observe(el) : loadFonts(S[+el.dataset.i]));
   };
+  const toast = document.createElement('div'); toast.className = 'toast'; document.body.append(toast);
+  const say = t => { toast.textContent = t; toast.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(() => toast.classList.remove('on'), 2400); };
+  const copy = async t => {
+    try { await navigator.clipboard.writeText(t); return true; }
+    catch (_) { const a = document.createElement('textarea'); a.value = t; document.body.append(a); a.select(); const ok = document.execCommand('copy'); a.remove(); return ok; }
+  };
+  gal.addEventListener('click', async e => {
+    const b = e.target.closest('button[data-a]'); if (!b) return;
+    const st = S[+b.closest('.st').dataset.i];
+    if (b.dataset.a === 'prompt') {
+      const ok = await copy(`Dùng skill slidemotion làm slide về [chủ đề của bạn], khoảng [số] slide, style ${st.slug} (${st.name}).`);
+      say(ok ? `Đã chép lệnh style ${st.name}. Dán vào Claude, thay phần trong ngoặc vuông.` : 'Trình duyệt chặn chép, hãy bấm Xem thẻ.');
+      return;
+    }
+    b.textContent = 'Đang lấy…';
+    try {
+      const md = await (await fetch(RAW + st.slug + '.md')).text();
+      const ok = await copy(`Làm slide HTML 16:9 về [chủ đề của bạn] theo thẻ style dưới đây. Giữ màu, phông, ngôn ngữ minh họa và chữ ký chuyển động; bố cục từng slide tự thiết kế.\n\n${md}`);
+      say(ok ? `Đã chép thẻ style ${st.name}. Dán vào AI bất kỳ.` : 'Trình duyệt chặn chép, hãy bấm Xem thẻ.');
+    } catch (_) { say('Không tải được thẻ, hãy bấm Xem thẻ.'); }
+    b.textContent = 'Chép thẻ';
+  });
   document.querySelector('.filters').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; g = b.dataset.g; document.querySelectorAll('.filters button').forEach(x => x.classList.toggle('on', x === b)); draw(); });
   q.addEventListener('input', draw);
   draw();
