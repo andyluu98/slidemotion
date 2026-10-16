@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Một ngày ở công trường: Agent, Skill, MCP</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fg:#F2F4F8; --mut:#A3AEC4; --dim:#6E7A94;
+  --or:#FF8A3D; --or2:#FFB067; --am:#FFC531; --cy:#3FD0FF; --mi:#4EE2A0; --rd:#FF5468;
+  --glass:rgba(7,12,24,.64); --line:rgba(255,255,255,.13);
+  --ease:cubic-bezier(.2,.8,.2,1); --cam:cubic-bezier(.65,0,.25,1);
+  --sans:'Be Vietnam Pro',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;overflow:hidden;color:var(--fg);font-family:var(--sans)}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#05070f}
+
+/* ---------- toàn cảnh công trường: trời, mặt trời, ba lớp thị sai ---------- */
+.ph{position:absolute;inset:0;opacity:0;transition:opacity 1.8s ease}
+.ph.on{opacity:1}
+.ph.dawn{background:linear-gradient(180deg,#0a0f26 0%,#2b2352 42%,#7a3b5e 66%,#ff8a5b 86%,#ffb27a 100%)}
+.ph.morn{background:linear-gradient(180deg,#081633 0%,#163d6b 45%,#3c78ad 72%,#8cc2e6 100%)}
+.ph.noon{background:linear-gradient(180deg,#071a35 0%,#11477a 45%,#2f7dbd 75%,#6fb6e8 100%)}
+.ph.aft{background:linear-gradient(180deg,#0d1532 0%,#2f3770 45%,#8a5a7a 72%,#f0a050 100%)}
+.ph.dusk{background:linear-gradient(180deg,#070a1c 0%,#2a1840 45%,#7a2c4c 70%,#ff6a3d 100%)}
+.ph.night{background:linear-gradient(180deg,#020409 0%,#060d24 55%,#0f1b40 100%)}
+#sun{position:absolute;width:420px;height:420px;border-radius:50%;left:0;top:0;transition:transform 2.2s var(--cam),opacity 1.6s,background 1.6s;
+  background:radial-gradient(circle,rgba(255,214,150,.95) 0 14%,rgba(255,170,90,.45) 24%,rgba(255,140,60,0) 62%)}
+.layer{position:absolute;left:0;bottom:0;width:3840px;height:1080px;transition:transform 1.6s var(--cam)}
+#far path,#far rect{fill:#0b1226}
+#mid .sil{fill:#070b18}
+#mid .frame{stroke:#121b33;stroke-width:6;fill:none}
+.win{fill:#FFD27A;opacity:0;transition:opacity .6s}
+#stage[data-light="1"] .win.a{opacity:.85}
+#stage[data-light="2"] .win{opacity:.9}
+#near .g{fill:#04060d}
+#shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(3,5,12,.7) 0%,rgba(3,5,12,.42) 38%,rgba(3,5,12,0) 62%),linear-gradient(180deg,rgba(3,5,12,.5) 0%,rgba(3,5,12,0) 28%),radial-gradient(120% 90% at 50% 40%,rgba(5,8,18,0) 40%,rgba(3,5,12,.55) 100%)}
+
+/* ---------- mũ bảo hộ phát sáng: nhân vật Agent ---------- */
+#hat{position:absolute;left:0;top:0;width:140px;height:96px;z-index:8;transform-origin:70px 60px;pointer-events:none;
+  transition:transform 1.3s var(--cam),opacity .6s;filter:drop-shadow(0 0 18px rgba(255,138,61,.75)) drop-shadow(0 0 50px rgba(255,138,61,.35))}
+#hat .bob{animation:bob 3.2s ease-in-out infinite;transform-origin:70px 60px}
+@keyframes bob{50%{transform:translateY(-8px)}}
+
+/* ---------- khung trình chiếu ---------- */
+#hud{position:absolute;left:120px;right:120px;top:40px;display:flex;justify-content:space-between;font:600 15px var(--mono);letter-spacing:.18em;color:rgba(255,255,255,.55);z-index:9;pointer-events:none}
+#hud b{color:var(--or)}
+#bar{position:absolute;left:120px;right:120px;bottom:38px;height:3px;background:rgba(255,255,255,.12);z-index:9}
+#bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--or),var(--am));transition:width 1.2s var(--cam);box-shadow:0 0 12px var(--or)}
+#clock{font:600 15px var(--mono);letter-spacing:.18em}
+
+/* ---------- slide và hiệu ứng vào ---------- */
+.slide{position:absolute;inset:0;visibility:hidden;transition:visibility 0s .55s;z-index:5}
+.slide.on{visibility:visible;transition-delay:0s}
+.r{opacity:0;transform:translate3d(var(--fx,0),var(--fy,40px),0) scale(var(--fs,1)) rotate(var(--fr,0deg));filter:blur(var(--fb,8px));transition:opacity .35s,transform .35s,filter .35s}
+.on .r:not([data-step]),.on .r.shown{opacity:1;transform:none;filter:blur(0);transition:opacity .8s var(--ease),transform 1s var(--ease),filter .8s var(--ease);transition-delay:calc(var(--d,0)*1ms + 350ms)}
+.slide svg .r{transform-box:fill-box;transform-origin:center}
+.r.l{--fx:-80px;--fy:0}.r.rt{--fx:80px;--fy:0}.r.s{--fs:.8;--fy:0}.r.dn{--fy:-140px;--fr:-3deg}.r.b{--fy:0;--fb:22px;--fs:1.04}
+.on .r.dn:not([data-step]),.on .r.dn.shown{transition:opacity .5s,transform 1.1s cubic-bezier(.3,1.5,.5,1),filter .5s;transition-delay:calc(var(--d,0)*1ms + 350ms)}
+.r.shown{transition-delay:calc(var(--d,0)*1ms)!important}
+[pathLength]{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .3s}
+.on [pathLength]:not([data-step]),.on [pathLength].shown{stroke-dashoffset:0;transition:stroke-dashoffset 1.5s var(--ease) calc(var(--d,0)*1ms + 350ms)}
+.grow{transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.on .grow:not([data-step]),.on .grow.shown{transform:scaleX(1);transition:transform 1.4s var(--ease) calc(var(--d,0)*1ms + 350ms)}
+.abs{position:absolute}
+.slide:not(.on) *{animation-play-state:paused!important}
+
+/* ---------- chữ ---------- */
+.kick{font:700 17px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--or)}
+.h{font:800 76px/1.06 var(--sans);letter-spacing:-.025em;text-shadow:0 4px 30px rgba(0,0,0,.45)}
+.h em{font-style:normal;color:var(--or)}
+.p{font:400 30px/1.5 var(--sans);color:#D5DBE8}
+.p b{color:#fff;font-weight:600}
+.src{font:400 18px/1.4 var(--mono);color:rgba(255,255,255,.45)}
+.glass{position:absolute;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:24px;box-shadow:0 30px 80px -30px rgba(0,0,0,.7)}
+.mono{font-family:var(--mono)}
+.pill{display:inline-block;font:800 30px var(--sans);letter-spacing:.06em;padding:10px 26px;border-radius:40px;border:2px solid currentColor;box-shadow:0 0 30px -6px currentColor inset,0 0 26px -10px currentColor}
+.ag{color:var(--or)}.sk{color:var(--am)}.mc{color:var(--cy)}.ok{color:var(--mi)}
+.big-num{font:900 560px/1 var(--sans);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:3px rgba(255,255,255,.14)}
+/* cửa sổ ứng dụng */
+.win-ui{position:absolute;background:rgba(10,14,26,.86);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.14);border-radius:18px;overflow:hidden;box-shadow:0 40px 90px -30px rgba(0,0,0,.85)}
+.win-ui .tb{height:52px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.08);font:600 17px var(--mono);color:var(--mut)}
+.win-ui .tb i{width:13px;height:13px;border-radius:50%;background:#ff5f57}.win-ui .tb i:nth-child(2){background:#febc2e}.win-ui .tb i:nth-child(3){background:#28c840;margin-right:14px}
+.bub{max-width:640px;padding:18px 24px;border-radius:22px;font:400 27px/1.45 var(--sans);margin-bottom:18px}
+.bub.me{background:#1d5bd8;margin-left:auto;border-bottom-right-radius:6px}
+.bub.bot{background:rgba(255,255,255,.08);border-bottom-left-radius:6px;color:#dfe5f1}
+/* terminal */
+.log{font:400 28px/1.9 var(--mono);color:#cfd7e6;padding:26px 32px}
+.log .ln{display:flex;gap:16px;align-items:baseline}
+.log .ok{color:var(--mi)}.log .st{color:var(--or);font-weight:700}
+.typing{display:inline-block;overflow:hidden;white-space:nowrap;vertical-align:bottom}
+/* biển báo */
+.sign{position:absolute;width:390px;height:330px;border-radius:20px;background:#FFC531;color:#14161c;padding:30px;box-shadow:0 30px 60px -30px rgba(0,0,0,.8)}
+.sign::before{content:"";position:absolute;inset:12px;border-radius:12px;border:4px solid #14161c}
+.sign h4{position:relative;font:900 30px/1.15 var(--sans);text-transform:uppercase;margin:62px 0 12px}
+.sign p{position:relative;font:500 23px/1.4 var(--sans)}
+.sign svg{position:absolute;left:30px;top:26px}
+/* gáy hồ sơ */
+.spine{position:absolute;bottom:250px;width:230px;height:560px;border-radius:10px 10px 4px 4px;padding:26px 22px;box-shadow:inset -10px 0 0 rgba(0,0,0,.15),inset 0 -40px 0 rgba(0,0,0,.12),0 30px 50px -25px rgba(0,0,0,.9);color:#1b1306}
+.spine .nm{font:600 15px var(--mono);letter-spacing:.06em;opacity:.75;word-break:break-all}
+.spine h4{font:800 30px/1.15 var(--sans);margin:12px 0 14px}
+.spine p{font:500 21px/1.4 var(--sans)}
+.spine .ring{position:absolute;left:50%;bottom:70px;width:60px;height:60px;margin-left:-30px;border-radius:50%;border:5px solid rgba(0,0,0,.35)}
+@keyframes flow{to{stroke-dashoffset:-48}}
+.cable{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:14 10;animation:flow 1.2s linear infinite}
+@keyframes blink{50%{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.18);opacity:.5}}
+@keyframes bounce{0%,100%{transform:translateX(0)}50%{transform:translateX(360px)}}
+@keyframes stampin{0%{opacity:0;transform:scale(2.6) rotate(-18deg)}70%{opacity:1;transform:scale(.94) rotate(-9deg)}100%{opacity:1;transform:scale(1) rotate(-10deg)}}
+.stamp{opacity:0}
+.on .stamp.shown,.on .stamp:not([data-step]){animation:stampin .6s cubic-bezier(.3,1.4,.5,1) forwards;animation-delay:calc(var(--d,0)*1ms + 350ms)}
+.stamp.shown{animation-delay:calc(var(--d,0)*1ms)!important}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="sky"><div class="ph dawn"></div><div class="ph morn"></div><div class="ph noon"></div><div class="ph aft"></div><div class="ph dusk"></div><div class="ph night"></div></div>
+  <div id="sun"></div>
+  <svg id="far" class="layer" viewBox="0 0 3840 1080"></svg>
+  <svg id="mid" class="layer" viewBox="0 0 3840 1080"></svg>
+  <svg id="near" class="layer" viewBox="0 0 3840 1080"></svg>
+  <div id="shade"></div>
+  <div id="hud"><span><b>AI</b> × XÂY DỰNG · AGENT · SKILL · MCP</span><span id="clock">06:00 · BÌNH MINH</span></div>
+  <div id="bar"><i></i></div>
+
+<!-- 1 BÌA · bình minh -->
+<section class="slide" data-cam="0" data-ph="dawn" data-time="06:00 · BÌNH MINH" data-hat="1460 250 1.6 1" data-sun="1300 520">
+  <p class="abs kick r" style="left:120px;top:250px">Buổi chia sẻ · một ngày ở công trường</p>
+  <h1 class="abs r b" style="left:110px;top:300px;font:900 168px/.92 var(--sans);letter-spacing:-.045em;--d:100">AI TRONG<br>XÂY DỰNG</h1>
+  <div class="abs" style="left:120px;top:640px;display:flex;gap:22px">
+    <span class="pill ag r s" style="--d:600">AGENT</span><span class="pill sk r s" style="--d:750">SKILL</span><span class="pill mc r s" style="--d:900">MCP</span>
+  </div>
+  <p class="abs p r" style="left:120px;top:760px;width:860px;--d:1100">Ba mảnh ghép giúp AI rời khung chat, <b>đi làm việc thật</b> với dữ liệu và quy trình của công ty xây dựng.</p>
+</section>
+
+<!-- 2 BA MẢNH GHÉP -->
+<section class="slide" data-cam="90" data-ph="dawn" data-time="06:20 · BÌNH MINH" data-hat="365 390 1.1 1" data-sun="1180 470">
+  <p class="abs kick r" style="left:120px;top:110px">Bức tranh chung</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Ba mảnh ghép, <em>ba vai trò</em></h2>
+  <div class="glass r" style="left:120px;top:290px;width:500px;height:660px;--d:200;border-color:rgba(255,138,61,.45)">
+    <div style="position:absolute;left:40px;top:250px;right:40px">
+      <p class="kick" style="color:var(--or)">người làm</p>
+      <h3 style="font:900 64px/1 var(--sans);margin:12px 0 18px;color:var(--or)">AGENT</h3>
+      <p class="p" style="font-size:27px">Như một kỹ sư được giao việc: tự lên kế hoạch, dùng công cụ, làm tới khi xong.</p>
+    </div>
+  </div>
+  <div class="glass r" style="left:710px;top:290px;width:500px;height:660px;--d:350;border-color:rgba(255,197,49,.45)">
+    <svg class="abs" style="left:150px;top:60px" width="200" height="160" fill="none" stroke="#FFC531" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" style="--d:600">
+      <path d="M100 40C70 20 30 20 12 30V140C30 130 70 130 100 150C130 130 170 130 188 140V30C170 20 130 20 100 40Z" pathLength="1" style="--d:500"/>
+      <path d="M100 40V150" pathLength="1" style="--d:900"/><path d="M38 60H76M38 84H76M124 60H162M124 84H162" pathLength="1" style="--d:1100"/>
+    </svg>
+    <div style="position:absolute;left:40px;top:250px;right:40px">
+      <p class="kick" style="color:var(--am)">sổ tay nghề</p>
+      <h3 style="font:900 64px/1 var(--sans);margin:12px 0 18px;color:var(--am)">SKILL</h3>
+      <p class="p" style="font-size:27px">Quy trình, mẫu biểu, mẹo của công ty, đóng gói để AI dùng lại mãi.</p>
+    </div>
+  </div>
+  <div class="glass r" style="left:1300px;top:290px;width:500px;height:660px;--d:500;border-color:rgba(63,208,255,.45)">
+    <svg class="abs" style="left:150px;top:50px" width="200" height="180" fill="none" stroke="#3FD0FF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M70 20V60M130 20V60" pathLength="1" style="--d:700"/><path d="M45 60H155V95C155 125 130 145 100 145C70 145 45 125 45 95Z" pathLength="1" style="--d:850"/><path d="M100 145V175" pathLength="1" style="--d:1100"/>
+    </svg>
+    <div style="position:absolute;left:40px;top:250px;right:40px">
+      <p class="kick" style="color:var(--cy)">ổ cắm chuẩn</p>
+      <h3 style="font:900 64px/1 var(--sans);margin:12px 0 18px;color:var(--cy)">MCP</h3>
+      <p class="p" style="font-size:27px">Một chuẩn kết nối chung để AI đọc, ghi vào phần mềm và dữ liệu của anh.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 CHATBOT BỊ NHỐT -->
+<section class="slide" data-cam="180" data-ph="dawn" data-time="06:40 · BÌNH MINH" data-hat="1390 640 1 1" data-sun="1060 430">
+  <p class="abs kick r" style="left:120px;top:110px;color:var(--rd)">Vấn đề</p>
+  <h2 class="abs h r" style="left:120px;top:145px;width:760px;--d:80">Chatbot bị nhốt <em style="color:var(--rd)">trong khung chat</em></h2>
+  <div class="abs" style="left:120px;top:400px;width:740px">
+    <div class="r l" style="--d:400;display:flex;gap:24px;margin-bottom:34px"><span style="font:900 54px/1 var(--sans);color:var(--rd)">1</span><p class="p"><b>Chỉ nói, không làm.</b> Không tự mở file, không tự gửi báo cáo.</p></div>
+    <div class="r l" style="--d:600;display:flex;gap:24px;margin-bottom:34px"><span style="font:900 54px/1 var(--sans);color:var(--rd)">2</span><p class="p"><b>Không biết cách làm của công ty.</b> Mẫu nhật ký, cách bóc khối lượng.</p></div>
+    <div class="r l" style="--d:800;display:flex;gap:24px"><span style="font:900 54px/1 var(--sans);color:var(--rd)">3</span><p class="p"><b>Không chạm được dữ liệu.</b> Bản vẽ, Excel, phần mềm kế toán ở bên ngoài.</p></div>
+  </div>
+  <div class="win-ui r s" style="left:1010px;top:250px;width:760px;height:560px;--d:300;border-color:rgba(255,84,104,.5);box-shadow:0 0 0 3px rgba(255,84,104,.18),0 40px 90px -30px rgba(0,0,0,.85)">
+    <div class="tb"><i></i><i></i><i></i>Chatbot</div>
+    <div style="padding:30px">
+      <div class="bub me r" style="--d:700;width:fit-content">Lập báo cáo tuần block B giúp anh.</div>
+      <div class="bub bot r" style="--d:1200;width:fit-content">Anh dán nhật ký và bảng tiến độ vào đây, em viết giúp.</div>
+    </div>
+  </div>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080" fill="none" stroke-width="4" stroke-linecap="round">
+    <g stroke="rgba(255,255,255,.35)" stroke-dasharray="10 12"><path d="M1010 330H930" pathLength="1" style="--d:1500"/><path d="M1390 810V880" pathLength="1" style="--d:1600"/><path d="M1770 420H1830" pathLength="1" style="--d:1700"/></g>
+  </svg>
+  <div class="abs r" style="left:1250px;top:890px;font:600 22px var(--mono);color:rgba(255,255,255,.55);--d:1900">✕ thư mục bản vẽ · ✕ Excel · ✕ camera</div>
+</section>
+
+<!-- 4 CHƯƠNG 01 AGENT · buổi sáng -->
+<section class="slide" data-cam="320" data-ph="morn" data-time="07:30 · BUỔI SÁNG" data-hat="1370 470 3.4 1" data-sun="900 300">
+  <p class="abs big-num r b" style="left:60px;top:40px">01</p>
+  <h2 class="abs r l" style="left:120px;top:420px;font:900 210px/1 var(--sans);letter-spacing:-.04em;background:linear-gradient(90deg,#FF8A3D,#FFB067);-webkit-background-clip:text;color:transparent;--d:200">AGENT</h2>
+  <p class="abs p r" style="left:126px;top:660px;width:780px;font-size:36px;--d:600">Người làm việc: nhận một mục tiêu, tự chia bước, tự dùng công cụ, làm tới khi xong.</p>
+  <div class="abs r s" style="left:1170px;top:280px;width:420px;height:420px;border-radius:50%;border:2px dashed rgba(255,138,61,.5);animation:spin 30s linear infinite;--d:300"></div>
+</section>
+
+<!-- 5 AGENT LÀ GÌ -->
+<section class="slide" data-cam="410" data-ph="morn" data-time="08:00 · BUỔI SÁNG" data-hat="1360 560 1.1 1" data-sun="860 260">
+  <p class="abs kick r" style="left:120px;top:110px">Agent</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Agent là gì</h2>
+  <p class="abs p r" style="left:120px;top:270px;width:760px;--d:250"><b>Agent</b> là AI được giao <b>một mục tiêu</b>, rồi tự đi vòng lặp: lập kế hoạch, dùng công cụ, kiểm tra, lặp lại tới khi xong.</p>
+  <div class="glass r" style="left:120px;top:560px;width:760px;height:170px;--d:500">
+    <p class="kick" style="position:absolute;left:32px;top:28px;color:var(--mut)">Chatbot · hỏi một câu, đáp một câu</p>
+    <div style="position:absolute;left:40px;top:96px;width:16px;height:16px;border-radius:50%;background:var(--mut);animation:bounce 1.6s ease-in-out infinite"></div>
+    <div style="position:absolute;left:30px;top:92px;width:40px;height:26px;border-left:3px solid var(--dim)"></div><div style="position:absolute;left:410px;top:92px;width:40px;height:26px;border-left:3px solid var(--dim)"></div>
+  </div>
+  <div class="glass r" style="left:120px;top:760px;width:760px;height:170px;--d:700;border-color:rgba(255,138,61,.5)">
+    <p class="kick" style="position:absolute;left:32px;top:28px">Agent · giao một việc, nhận một kết quả</p>
+    <p class="p" style="position:absolute;left:32px;top:76px;font-size:26px">Tự làm nhiều bước, rồi trình anh duyệt.</p>
+  </div>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080" fill="none">
+    <circle cx="1360" cy="560" r="300" stroke="rgba(255,255,255,.18)" stroke-width="3" pathLength="1" style="--d:300"/>
+    <path id="orb5" d="M1360 260A300 300 0 1 1 1359.9 260" stroke="none"/>
+    <circle r="14" fill="#FF8A3D" style="filter:drop-shadow(0 0 12px #FF8A3D)"><animateMotion dur="5s" repeatCount="indefinite"><mpath href="#orb5"/></animateMotion></circle>
+    <circle r="40" fill="rgba(255,255,255,.08)" stroke="#3FD0FF" stroke-width="3" cx="1360" cy="260"/><circle r="40" fill="rgba(255,255,255,.08)" stroke="#FFC531" stroke-width="3" cx="1660" cy="560"/>
+    <circle r="40" fill="rgba(255,255,255,.08)" stroke="#3FD0FF" stroke-width="3" cx="1360" cy="860"/><circle r="40" fill="rgba(255,255,255,.08)" stroke="#4EE2A0" stroke-width="3" cx="1060" cy="560"/>
+  </svg>
+  <div style="font:700 26px var(--sans)">
+    <p class="abs r" style="left:1430px;top:200px;--d:600">1 · Mục tiêu</p>
+    <p class="abs r" style="left:1500px;top:640px;--d:800">2 · Lập kế hoạch</p>
+    <p class="abs r" style="left:1430px;top:880px;--d:1000">3 · Dùng công cụ</p>
+    <p class="abs r" style="left:930px;top:640px;--d:1200;text-align:right;width:200px">4 · Kiểm tra</p>
+  </div>
+</section>
+
+<!-- 6 VÍ DỤ CHẠY THẬT -->
+<section class="slide" data-cam="500" data-ph="morn" data-time="08:30 · BUỔI SÁNG" data-hat="610 560 .9 1" data-sun="820 230">
+  <p class="abs kick r" style="left:120px;top:110px">Agent · xem nó làm</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Một câu giao việc, <em>năm bước tự chạy</em></h2>
+  <div class="glass r l" style="left:120px;top:300px;width:560px;height:250px;--d:250">
+    <p class="kick" style="position:absolute;left:30px;top:28px;color:#7fb2ff">Zalo · Chỉ huy trưởng</p>
+    <div class="bub me" style="position:absolute;left:30px;right:30px;top:72px;max-width:none">Lập báo cáo tiến độ tuần block B, chiều nay gửi anh.</div>
+  </div>
+  <svg class="abs" style="left:560px;top:560px" width="160" height="160" fill="none"><path d="M60 0V80Q60 120 120 120" stroke="#FF8A3D" stroke-width="5" stroke-linecap="round" stroke-dasharray="10 10" pathLength="1" style="--d:600"/></svg>
+  <div class="win-ui r rt" style="left:740px;top:300px;width:1060px;height:600px;--d:500">
+    <div class="tb"><i></i><i></i><i></i>agent · báo cáo tuần block B</div>
+    <div class="log">
+      <div class="ln r" style="--d:1000"><span class="ok">✓</span>Đọc nhật ký cả tuần trong thư mục Block B</div>
+      <div class="ln r" style="--d:1500"><span class="ok">✓</span>So khối lượng với tiến độ kế hoạch (Excel)</div>
+      <div class="ln r" style="--d:2000"><span class="ok">✓</span>Tìm hạng mục chậm: xây tường tầng 4, lý do: mưa</div>
+      <div class="ln r" style="--d:2500"><span class="ok">✓</span>Viết báo cáo theo mẫu công ty</div>
+      <div class="ln r" style="--d:3000"><span class="st">→</span><span style="color:#fff">Gửi chỉ huy trưởng, <span style="color:var(--or)">chờ duyệt</span></span><span style="animation:blink 1s steps(1) infinite;color:var(--or)">▍</span></div>
+    </div>
+    <div style="position:absolute;left:32px;right:32px;bottom:34px;height:10px;border-radius:5px;background:rgba(255,255,255,.08)"><div class="grow" style="height:100%;border-radius:5px;background:linear-gradient(90deg,#FF8A3D,#4EE2A0);--d:900"></div></div>
+  </div>
+  <p class="abs src r" style="left:740px;top:920px;--d:3300">Minh họa: tên thư mục, hạng mục và lý do chỉ là ví dụ.</p>
+</section>
+
+<!-- 7 GIẢI PHẪU MỘT AGENT -->
+<section class="slide" data-cam="590" data-ph="morn" data-time="09:00 · BUỔI SÁNG" data-hat="960 560 2.2 1" data-sun="800 210">
+  <p class="abs kick r" style="left:120px;top:110px">Agent · giải phẫu</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Một agent cần <em>năm thứ</em></h2>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080" fill="none" stroke-width="3">
+    <circle cx="960" cy="590" r="170" stroke="rgba(255,138,61,.35)" stroke-dasharray="6 10" pathLength="1" style="--d:200"/>
+    <circle cx="960" cy="590" r="250" stroke="rgba(255,255,255,.1)" pathLength="1" style="--d:300"/>
+    <g stroke="rgba(255,255,255,.55)"><path d="M590 360L800 470" pathLength="1" style="--d:700"/><path d="M1330 360L1120 470" pathLength="1" style="--d:850"/>
+    <path d="M590 790L800 680" pathLength="1" style="--d:1000"/><path d="M1330 790L1120 680" pathLength="1" style="--d:1150"/><path d="M960 880V770" pathLength="1" style="--d:1300"/></g>
+    <g fill="#fff"><circle cx="800" cy="470" r="7"/><circle cx="1120" cy="470" r="7"/><circle cx="800" cy="680" r="7"/><circle cx="1120" cy="680" r="7"/><circle cx="960" cy="770" r="7"/></g>
+  </svg>
+  <div class="abs r l" style="left:120px;top:290px;width:470px;--d:600"><p class="kick" style="color:#9fb3d6">01 · bộ não</p><p class="p" style="margin-top:8px"><b>Mô hình ngôn ngữ</b>: đọc hiểu, suy luận, viết.</p></div>
+  <div class="abs r rt" style="left:1330px;top:290px;width:470px;--d:750"><p class="kick" style="color:var(--am)">02 · hướng dẫn nghề</p><p class="p" style="margin-top:8px"><b>Skill</b>: làm theo đúng cách của công ty.</p></div>
+  <div class="abs r l" style="left:120px;top:720px;width:470px;--d:900"><p class="kick" style="color:var(--cy)">03 · công cụ, kết nối</p><p class="p" style="margin-top:8px">Đọc file, chạy lệnh, gọi phần mềm qua <b>MCP</b>.</p></div>
+  <div class="abs r rt" style="left:1330px;top:720px;width:470px;--d:1050"><p class="kick" style="color:#c9b6ff">04 · bộ nhớ dự án</p><p class="p" style="margin-top:8px">Ghi chú, quyết định, để <b>không hỏi lại</b>.</p></div>
+  <div class="abs r" style="left:710px;top:890px;width:500px;text-align:center;--d:1200"><p class="kick" style="color:var(--mi)">05 · người duyệt</p><p class="p" style="margin-top:8px">Gửi, ký, chi tiền: <b>anh quyết</b>.</p></div>
+</section>
+
+<!-- 8 CHƯƠNG 02 SKILL · giữa trưa -->
+<section class="slide" data-cam="760" data-ph="noon" data-time="11:30 · GIỮA TRƯA" data-hat="1590 330 1.2 1" data-sun="1640 120">
+  <p class="abs big-num r b" style="left:60px;top:40px">02</p>
+  <h2 class="abs r l" style="left:120px;top:420px;font:900 210px/1 var(--sans);letter-spacing:-.04em;background:linear-gradient(90deg,#FFC531,#FFE08A);-webkit-background-clip:text;color:transparent;--d:200">SKILL</h2>
+  <p class="abs p r" style="left:126px;top:660px;width:780px;font-size:36px;--d:600">Sổ tay nghề: dạy AI làm đúng cách của công ty anh. Viết một lần, dùng mãi.</p>
+  <svg class="abs" style="left:1160px;top:380px" width="560" height="420" fill="none" stroke="#FFC531" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 24px rgba(255,197,49,.45))">
+    <path d="M280 70C210 20 90 20 20 50V380C90 350 210 350 280 400C350 350 470 350 540 380V50C470 20 350 20 280 70Z" pathLength="1" style="--d:300"/>
+    <path d="M280 70V400" pathLength="1" style="--d:800"/><path d="M80 120H220M80 170H220M80 220H190M340 120H480M340 170H480M340 220H450" stroke-width="6" pathLength="1" style="--d:1100"/>
+  </svg>
+</section>
+
+<!-- 9 SKILL LÀ MỘT THƯ MỤC -->
+<section class="slide" data-cam="850" data-ph="noon" data-time="12:00 · GIỮA TRƯA" data-hat="1340 860 .8 1" data-sun="1640 120">
+  <p class="abs kick r" style="left:120px;top:110px;color:var(--am)">Skill</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Skill là <em style="color:var(--am)">một thư mục</em></h2>
+  <p class="abs p r" style="left:120px;top:280px;width:760px;--d:250">Trong đó có <b>hướng dẫn</b>, <b>đoạn mã</b> và <b>tài liệu tham khảo</b>. Việc khớp thì AI tự lấy ra dùng; anh không phải dặn lại mỗi lần.</p>
+  <div class="glass r" style="left:120px;top:540px;width:760px;height:200px;--d:500;border-color:rgba(255,197,49,.5)">
+    <p class="p" style="position:absolute;left:34px;right:34px;top:32px">Giống bộ tài liệu công ty soạn cho <b>nhân viên mới</b>: đọc một lần là làm đúng quy trình.</p>
+  </div>
+  <p class="abs src r" style="left:120px;top:960px;--d:900">Nguồn: Agent Skills, platform.claude.com, tra ngày 16/10/2026.</p>
+  <div class="abs" style="left:1060px;top:300px;width:600px;height:520px">
+    <div class="r" style="--d:500;position:absolute;left:0;top:60px;width:260px;height:400px;border-radius:16px;background:#c98a15;transform-origin:50% 100%;rotate:-10deg;box-shadow:0 30px 60px -20px rgba(0,0,0,.7);padding:30px;color:#1b1306">
+      <p class="mono" style="font-size:18px;opacity:.7">mau/</p><h4 style="font:800 34px/1.1 var(--sans);margin-top:10px">Mẫu biểu, tài liệu</h4></div>
+    <div class="r" style="--d:700;position:absolute;left:220px;top:30px;width:260px;height:400px;border-radius:16px;background:#e3a52a;transform-origin:50% 100%;rotate:0deg;box-shadow:0 30px 60px -20px rgba(0,0,0,.7);padding:30px;color:#1b1306">
+      <p class="mono" style="font-size:18px;opacity:.7">scripts/</p><h4 style="font:800 34px/1.1 var(--sans);margin-top:10px">Mã chạy được</h4></div>
+    <div class="r" style="--d:900;position:absolute;left:440px;top:60px;width:260px;height:400px;border-radius:16px;background:#FFC531;transform-origin:50% 100%;rotate:10deg;box-shadow:0 30px 60px -20px rgba(0,0,0,.7);padding:30px;color:#1b1306">
+      <p class="mono" style="font-size:18px;opacity:.7">SKILL.md</p><h4 style="font:800 34px/1.1 var(--sans);margin-top:10px">Hướng dẫn chính</h4></div>
+  </div>
+</section>
+
+<!-- 10 BÊN TRONG MỘT SKILL -->
+<section class="slide" data-cam="940" data-ph="noon" data-time="12:30 · GIỮA TRƯA" data-hat="1840 1000 .5 0" data-sun="1640 120">
+  <p class="abs kick r" style="left:120px;top:110px;color:var(--am)">Skill · bên trong</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Mở thử skill <em style="color:var(--am)">bóc khối lượng</em></h2>
+  <div class="win-ui r s" style="left:120px;top:280px;width:1680px;height:600px;--d:250">
+    <div class="tb"><i></i><i></i><i></i>boc-khoi-luong / SKILL.md</div>
+    <div style="position:absolute;left:0;top:52px;bottom:0;width:430px;border-right:1px solid rgba(255,255,255,.08);padding:26px 30px;font:400 24px/1.85 var(--mono);color:#b9c3d6">
+      <div style="color:var(--am)">▾ boc-khoi-luong/</div>
+      <div style="padding-left:28px;background:rgba(255,197,49,.12);margin:0 -30px;padding-left:58px;color:#fff">SKILL.md</div>
+      <div style="padding-left:28px">don-gia-cong-ty.xlsx</div>
+      <div style="padding-left:28px;color:var(--am)">▾ scripts/</div>
+      <div style="padding-left:56px">tinh-khoi-luong.py</div>
+      <div style="padding-left:28px;color:var(--am)">▾ mau/</div>
+      <div style="padding-left:56px">bang-du-toan.xlsx</div>
+    </div>
+    <div style="position:absolute;left:430px;top:52px;right:0;bottom:0;padding:26px 36px;font:400 25px/1.75 var(--mono);color:#cfd7e6">
+      <div class="r" style="--d:700;background:rgba(255,197,49,.10);margin:0 -36px;padding:4px 36px;border-left:4px solid var(--am)">
+        <div style="color:#7d879c">---</div>
+        <div><span style="color:var(--am)">name</span>: boc-khoi-luong</div>
+        <div><span style="color:var(--am)">description</span>: Bóc khối lượng từ bảng thống kê bản vẽ,</div>
+        <div>  áp đơn giá công ty, xuất Excel. Dùng khi người dùng</div>
+        <div>  gửi bản vẽ và cần dự toán.</div>
+        <div style="color:#7d879c">---</div>
+      </div>
+      <div class="r" style="--d:1100;margin-top:10px"><span style="color:#7fb2ff"># Cách làm</span></div>
+      <div class="r" style="--d:1300">1. Đọc bảng thống kê ở từng tờ bản vẽ.</div>
+      <div class="r" style="--d:1500">2. Chạy scripts/tinh-khoi-luong.py.</div>
+      <div class="r" style="--d:1700">3. Ghi nguồn tờ, ô cho mọi dòng.<span style="animation:blink 1s steps(1) infinite;color:var(--am)">▍</span></div>
+    </div>
+  </div>
+  <div class="abs r rt" style="left:1330px;top:250px;width:470px;--d:1900"><div style="background:var(--or);color:#1a0d02;border-radius:14px;padding:16px 22px;font:600 23px/1.4 var(--sans);box-shadow:0 20px 40px -15px rgba(0,0,0,.7)">name và description là bắt buộc. AI đọc description để <b>tự chọn đúng skill</b>.</div></div>
+  <p class="abs src r" style="left:120px;top:920px;--d:2100">Ví dụ minh họa. Quy định trường bắt buộc theo Agent Skills, platform.claude.com, tra ngày 16/10/2026.</p>
+</section>
+
+<!-- 11 NẠP DẦN BA TẦNG -->
+<section class="slide" data-cam="1030" data-ph="noon" data-time="13:00 · ĐẦU CHIỀU" data-hat="1840 1000 .5 0" data-sun="1640 120">
+  <p class="abs kick r" style="left:120px;top:110px;color:var(--am)">Skill · cách nạp</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Như tòa nhà <em style="color:var(--am)">bật đèn từng tầng</em></h2>
+  <p class="abs p r" style="left:120px;top:290px;width:720px;--d:250">AI không đọc hết mọi skill một lúc. Tầng nào cần mới <b>bật đèn</b> tầng đó, nên cài nhiều skill vẫn nhẹ.</p>
+  <p class="abs p r" style="left:120px;top:520px;width:720px;font-size:26px;color:var(--mut);--d:400"><b>Token</b>: đơn vị chữ mà AI đọc. Càng ít token, AI càng nhanh và rẻ.</p>
+  <div class="abs" style="left:980px;top:270px;width:820px">
+    <div class="r dn" data-step="1" style="height:200px;margin-bottom:18px;border-radius:18px;border:2px dashed rgba(63,208,255,.6);background:rgba(63,208,255,.10);padding:26px 34px;position:relative">
+      <p class="kick" style="color:var(--cy)">Tầng 3 · chỉ khi cần</p><p class="p" style="font-size:26px;margin-top:10px">Tài liệu, script. Script chạy xong, chỉ kết quả đi vào bộ nhớ làm việc.</p></div>
+    <div class="r dn" style="--d:900;height:170px;margin-bottom:18px;border-radius:18px;background:linear-gradient(90deg,rgba(255,197,49,.30),rgba(255,197,49,.12));border:2px solid rgba(255,197,49,.7);padding:26px 34px;box-shadow:0 0 50px -10px rgba(255,197,49,.6)">
+      <p class="kick" style="color:var(--am)">Tầng 2 · khi việc khớp mô tả</p><p class="p" style="font-size:26px;margin-top:10px">Nội dung SKILL.md. <b>Dưới 5 nghìn token.</b></p></div>
+    <div class="r dn" style="--d:400;height:150px;border-radius:18px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.5);padding:24px 34px;box-shadow:0 0 50px -10px rgba(255,255,255,.4)">
+      <p class="kick" style="color:#fff">Tầng 1 · luôn bật</p><p class="p" style="font-size:26px;margin-top:10px">Tên và mô tả. <b>Khoảng 100 token</b> mỗi skill.</p></div>
+  </div>
+  <p class="abs src r" style="left:980px;top:940px;--d:1200">Bấm để bật tầng 3. Số token theo Agent Skills, platform.claude.com, tra 16/10/2026.</p>
+</section>
+
+<!-- 12 GIÁ SÁCH SÁU SKILL -->
+<section class="slide" data-cam="1120" data-ph="noon" data-time="13:30 · ĐẦU CHIỀU" data-hat="1740 220 .9 1" data-sun="1640 120">
+  <p class="abs kick r" style="left:120px;top:110px;color:var(--am)">Skill · cho công ty xây dựng</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Giá sách <em style="color:var(--am)">sáu skill đầu tiên</em></h2>
+  <div class="abs r" style="left:100px;top:830px;width:1720px;height:22px;border-radius:6px;background:#3a2a14;box-shadow:0 18px 30px -10px rgba(0,0,0,.8);--d:100"></div>
+  <div class="spine r dn" style="left:120px;background:#FFC531;--d:200"><p class="nm">nhat-ky-thi-cong</p><h4>Nhật ký thi công</h4><p>Gom ảnh, tin nhắn trong ngày thành nhật ký đúng mẫu.</p><span class="ring"></span></div>
+  <div class="spine r dn" style="left:410px;background:#F4B13A;--d:330"><p class="nm">boc-khoi-luong</p><h4>Bóc khối lượng</h4><p>Đọc bảng thống kê bản vẽ, ra Excel có nguồn.</p><span class="ring"></span></div>
+  <div class="spine r dn" style="left:700px;background:#FF9F45;--d:460"><p class="nm">bien-ban-nghiem-thu</p><h4>Biên bản nghiệm thu</h4><p>Đúng mẫu, đủ thành phần, đủ chỗ ký.</p><span class="ring"></span></div>
+  <div class="spine r dn" style="left:990px;background:#FFC531;--d:590"><p class="nm">ho-so-thanh-toan</p><h4>Hồ sơ thanh toán</h4><p>Gom khối lượng nghiệm thu thành hồ sơ từng đợt.</p><span class="ring"></span></div>
+  <div class="spine r dn" style="left:1280px;background:#F4B13A;--d:720"><p class="nm">kiem-tra-an-toan</p><h4>Kiểm tra an toàn</h4><p>Danh mục theo hạng mục, ghi lỗi kèm ảnh.</p><span class="ring"></span></div>
+  <div class="spine r dn" style="left:1570px;background:#FF9F45;--d:850"><p class="nm">bao-cao-tuan</p><h4>Báo cáo tuần</h4><p>Tiến độ, hạng mục chậm, kế hoạch tuần sau.</p><span class="ring"></span></div>
+  <p class="abs src r" style="left:120px;top:900px;--d:1200">Tên skill là ví dụ; mỗi công ty tự đặt theo quy trình của mình.</p>
+</section>
+
+<!-- 13 CHƯƠNG 03 MCP · buổi chiều -->
+<section class="slide" data-cam="1300" data-ph="aft" data-time="15:00 · BUỔI CHIỀU" data-hat="1480 690 1.1 1" data-sun="1340 300">
+  <p class="abs big-num r b" style="left:60px;top:40px">03</p>
+  <h2 class="abs r l" style="left:120px;top:420px;font:900 210px/1 var(--sans);letter-spacing:-.04em;background:linear-gradient(90deg,#3FD0FF,#9BE7FF);-webkit-background-clip:text;color:transparent;--d:200">MCP</h2>
+  <p class="abs p r" style="left:126px;top:660px;width:800px;font-size:36px;--d:600">Ổ cắm chuẩn: nối AI vào phần mềm và dữ liệu của công ty theo một cách chung.</p>
+  <svg class="abs" style="left:1160px;top:250px" width="600" height="520" fill="none" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 26px rgba(63,208,255,.5))">
+    <rect x="320" y="160" width="220" height="200" rx="40" stroke="#3FD0FF" stroke-width="9" pathLength="1" style="--d:300"/>
+    <rect x="380" y="230" width="100" height="60" rx="30" stroke="#3FD0FF" stroke-width="7" pathLength="1" style="--d:600"/>
+    <g class="r rt" style="--d:900;--fx:-200px"><path d="M60 260H230" stroke="#9fb7d6" stroke-width="12"/><rect x="230" y="235" width="110" height="50" rx="14" stroke="#fff" stroke-width="8"/></g>
+    <circle cx="350" cy="260" r="10" fill="#fff" class="r s" style="--d:1500;animation:pulse 1.4s ease-in-out infinite"/>
+  </svg>
+</section>
+
+<!-- 14 MCP LÀ GÌ: TRƯỚC VÀ SAU -->
+<section class="slide" data-cam="1390" data-ph="aft" data-time="15:30 · BUỔI CHIỀU" data-hat="510 660 1 1" data-sun="1760 640">
+  <p class="abs kick r" style="left:120px;top:110px;color:var(--cy)">MCP</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">MCP giống <em style="color:var(--cy)">cổng USB-C</em> của AI</h2>
+  <p class="abs p r" style="left:120px;top:270px;width:1680px;font-size:28px;--d:250"><b>MCP (Model Context Protocol)</b> là chuẩn mở để nối ứng dụng AI với hệ thống bên ngoài: dữ liệu, công cụ, quy trình. Một kiểu cắm cho mọi thiết bị.</p>
+  <p class="abs kick r" style="left:120px;top:400px;color:var(--mut);--d:400">Trước · mỗi phần mềm một kiểu nối</p>
+  <p class="abs kick" data-step="1" style="left:1000px;top:400px;color:var(--cy)"><span class="r" data-step="1" style="display:inline-block">Có MCP · một chuẩn chung</span></p>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080" fill="none" stroke-linecap="round" stroke-width="5">
+    <path d="M510 700C400 600 330 640 240 520" stroke="#FFC531" stroke-dasharray="3 10" pathLength="1" style="--d:600"/>
+    <path d="M510 700C640 560 700 700 780 520" stroke="#4EE2A0" stroke-dasharray="20 6 4 6" pathLength="1" style="--d:750"/>
+    <path d="M510 700C380 820 330 760 240 880" stroke="#c9b6ff" pathLength="1" style="--d:900"/>
+    <path d="M510 700C660 860 700 780 780 880" stroke="#FF5468" stroke-dasharray="2 8" pathLength="1" style="--d:1050"/>
+    <g class="r" data-step="1">
+      <path class="cable" d="M1400 700L1120 520" stroke="#3FD0FF"/><path class="cable" d="M1400 700L1680 520" stroke="#3FD0FF"/>
+      <path class="cable" d="M1400 700L1120 880" stroke="#3FD0FF"/><path class="cable" d="M1400 700L1680 880" stroke="#3FD0FF"/>
+      <rect x="1360" y="670" width="80" height="60" rx="18" fill="#0b1b2b" stroke="#3FD0FF" stroke-width="6"/>
+    </g>
+  </svg>
+  <div style="font:700 24px var(--sans)">
+    <div class="abs glass r s" style="left:150px;top:470px;width:180px;height:80px;border-radius:16px;text-align:center;line-height:80px;--d:500">Bản vẽ</div>
+    <div class="abs glass r s" style="left:690px;top:470px;width:180px;height:80px;border-radius:16px;text-align:center;line-height:80px;--d:550">Excel</div>
+    <div class="abs glass r s" style="left:150px;top:850px;width:180px;height:80px;border-radius:16px;text-align:center;line-height:80px;--d:600">Kế toán</div>
+    <div class="abs glass r s" style="left:690px;top:850px;width:180px;height:80px;border-radius:16px;text-align:center;line-height:80px;--d:650">Camera</div>
+    <div class="abs glass r s" data-step="1" style="left:1030px;top:470px;width:180px;height:80px;border-radius:16px;text-align:center;line-height:80px;border-color:var(--cy)">Bản vẽ</div>
+    <div class="abs glass r s" data-step="1" style="left:1590px;top:470px;width:180px;height:80px;border-radius:16px;text-align:center;line-height:80px;border-color:var(--cy)">Excel</div>
+    <div class="abs glass r s" data-step="1" style="left:1030px;top:850px;width:180px;height:80px;border-radius:16px;text-align:center;line-height:80px;border-color:var(--cy)">Kế toán</div>
+    <div class="abs glass r s" data-step="1" style="left:1590px;top:850px;width:180px;height:80px;border-radius:16px;text-align:center;line-height:80px;border-color:var(--cy)">Camera</div>
+  </div>
+  <p class="abs src r" style="left:120px;top:965px;--d:1300">Định nghĩa, ví von USB-C: modelcontextprotocol.io, tra 16/10/2026. Bấm để xem bên phải.</p>
+</section>
+
+<!-- 15 HOST, CLIENT, SERVER -->
+<section class="slide" data-cam="1480" data-ph="aft" data-time="16:00 · BUỔI CHIỀU" data-hat="300 610 1 1" data-sun="1720 170">
+  <p class="abs kick r" style="left:120px;top:110px;color:var(--cy)">MCP · kiến trúc</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Host, client, <em style="color:var(--cy)">server</em></h2>
+  <div class="win-ui r l" style="left:120px;top:280px;width:640px;height:600px;--d:200">
+    <div class="tb"><i></i><i></i><i></i>HOST · ứng dụng AI</div>
+    <p class="src" style="position:absolute;left:28px;top:70px">ví dụ: Claude Desktop, Claude Code</p>
+  </div>
+  <div style="font:700 26px/76px var(--sans);text-align:center;color:#06202c">
+    <div class="abs r s" style="left:450px;top:420px;width:260px;height:76px;border-radius:40px;background:var(--cy);box-shadow:0 0 30px -6px var(--cy);--d:600">client 1</div>
+    <div class="abs r s" style="left:450px;top:580px;width:260px;height:76px;border-radius:40px;background:var(--cy);box-shadow:0 0 30px -6px var(--cy);--d:750">client 2</div>
+    <div class="abs r s" style="left:450px;top:740px;width:260px;height:76px;border-radius:40px;background:var(--cy);box-shadow:0 0 30px -6px var(--cy);--d:900">client 3</div>
+  </div>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080" fill="none">
+    <rect x="1120" y="290" width="700" height="400" rx="24" stroke="rgba(255,255,255,.35)" stroke-width="3" stroke-dasharray="12 10" pathLength="1" style="--d:800"/>
+    <g class="r" style="--d:1100"><path class="cable" d="M710 458H1180" stroke="#3FD0FF"/><path class="cable" d="M710 618H1180" stroke="#3FD0FF"/><path class="cable" d="M710 778H1180" stroke="#7fb2ff" style="stroke-dasharray:4 12"/></g>
+  </svg>
+  <p class="abs kick r" style="left:1150px;top:310px;color:var(--mut);--d:900">trên máy anh</p>
+  <div class="glass r rt" style="left:1180px;top:400px;width:600px;height:110px;padding:20px 28px;--d:1000"><p style="font:700 28px var(--sans)">Server thư mục bản vẽ</p><p class="mono" style="font-size:19px;color:var(--cy);margin-top:6px">stdio · cùng một máy</p></div>
+  <div class="glass r rt" style="left:1180px;top:560px;width:600px;height:110px;padding:20px 28px;--d:1150"><p style="font:700 28px var(--sans)">Server file Excel tiến độ</p><p class="mono" style="font-size:19px;color:var(--cy);margin-top:6px">stdio · cùng một máy</p></div>
+  <div class="glass r rt" style="left:1180px;top:720px;width:600px;height:110px;padding:20px 28px;--d:1300;border-color:rgba(127,178,255,.6)"><p style="font:700 28px var(--sans)">Server phần mềm kế toán ☁</p><p class="mono" style="font-size:19px;color:#7fb2ff;margin-top:6px">Streamable HTTP · qua mạng</p></div>
+  <p class="abs p r" style="left:120px;top:910px;width:1680px;font-size:26px;--d:1600">Host tạo <b>một client cho mỗi server</b>. Server là chương trình mang dữ liệu, công cụ tới cho AI. <span class="src">modelcontextprotocol.io, kiến trúc, tra 16/10/2026.</span></p>
+</section>
+
+<!-- 16 BA NGĂN KÉO CỦA SERVER -->
+<section class="slide" data-cam="1570" data-ph="aft" data-time="16:30 · BUỔI CHIỀU" data-hat="1840 1000 .5 0" data-sun="1720 170">
+  <p class="abs kick r" style="left:120px;top:110px;color:var(--cy)">MCP · bên trong một server</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Một server có <em style="color:var(--cy)">ba ngăn kéo</em></h2>
+  <div class="glass r" style="left:120px;top:300px;width:520px;height:600px;--d:300">
+    <svg class="abs" style="left:40px;top:40px" width="110" height="110" fill="none" stroke="#3FD0FF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M70 20a26 26 0 0 0-30 34L12 82l16 16 28-28a26 26 0 0 0 34-30l-16 16-14-4-4-14z" pathLength="1" style="--d:600"/></svg>
+    <div style="position:absolute;left:40px;right:40px;top:180px"><p class="kick" style="color:var(--cy)">tools · công cụ</p><p class="p" style="font-size:27px;margin:12px 0 22px">Hàm AI gọi để <b>làm việc</b>: truy vấn, gọi phần mềm, thao tác file.</p>
+      <p class="mono" style="font-size:21px;line-height:1.7;color:#9fe3ff">tra_don_gia(ma_vat_tu)<br>tao_de_xuat_vat_tu(...)</p></div></div>
+  <div class="glass r" style="left:700px;top:300px;width:520px;height:600px;--d:500">
+    <svg class="abs" style="left:40px;top:40px" width="110" height="110" fill="none" stroke="#FFC531" stroke-width="7"><ellipse cx="55" cy="24" rx="40" ry="14" pathLength="1" style="--d:800"/><path d="M15 24V86c0 8 18 14 40 14s40-6 40-14V24M15 55c0 8 18 14 40 14s40-6 40-14" pathLength="1" style="--d:900"/></svg>
+    <div style="position:absolute;left:40px;right:40px;top:180px"><p class="kick" style="color:var(--am)">resources · dữ liệu</p><p class="p" style="font-size:27px;margin:12px 0 22px">Thứ để AI <b>đọc</b>: nội dung file, bản ghi, kết quả từ phần mềm.</p>
+      <p class="mono" style="font-size:21px;line-height:1.7;color:#ffe08a">danh mục vật tư<br>bảng tiến độ dự án</p></div></div>
+  <div class="glass r" style="left:1280px;top:300px;width:520px;height:600px;--d:700">
+    <svg class="abs" style="left:40px;top:40px" width="110" height="110" fill="none" stroke="#4EE2A0" stroke-width="7" stroke-linecap="round"><rect x="16" y="10" width="78" height="92" rx="12" pathLength="1" style="--d:1000"/><path d="M34 38H76M34 58H76M34 78H60" pathLength="1" style="--d:1100"/></svg>
+    <div style="position:absolute;left:40px;right:40px;top:180px"><p class="kick" style="color:var(--mi)">prompts · mẫu soạn sẵn</p><p class="p" style="font-size:27px;margin:12px 0 22px">Khuôn tương tác <b>dùng lại</b> để hỏi đúng, đủ ý.</p>
+      <p class="mono" style="font-size:21px;line-height:1.7;color:#a6f3cc">mẫu báo cáo ngày<br>mẫu kiểm hồ sơ thanh toán</p></div></div>
+  <p class="abs src r" style="left:120px;top:940px;--d:1300">Ba loại theo modelcontextprotocol.io, tra 16/10/2026. Tên công cụ, dữ liệu là minh họa.</p>
+</section>
+
+<!-- 17 BẢN ĐỒ CÔNG TRƯỜNG -->
+<section class="slide" data-cam="1660" data-ph="aft" data-time="17:00 · CHIỀU MUỘN" data-hat="1290 560 1 1" data-sun="1240 430">
+  <p class="abs kick r" style="left:120px;top:110px;color:var(--cy)">MCP · trên mặt bằng công trường</p>
+  <h2 class="abs h r" style="left:120px;top:145px;width:720px;--d:80">Cắm AI vào <em style="color:var(--cy)">phần mềm đang dùng</em></h2>
+  <div class="abs" style="left:120px;top:420px;width:620px">
+    <p class="p r l" style="--d:500;margin-bottom:26px">Nhiều phần mềm phổ biến <b>đã có sẵn server MCP</b>.</p>
+    <p class="p r l" style="--d:700;margin-bottom:26px">Phần mềm riêng thì <b>viết một server nhỏ</b>.</p>
+    <p class="p r l" style="--d:900">Bắt đầu <b>chỉ đọc</b>, quen rồi mới mở quyền ghi.</p>
+  </div>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080" fill="none">
+    <rect x="860" y="250" width="940" height="680" rx="18" fill="rgba(6,12,26,.72)" stroke="rgba(255,255,255,.4)" stroke-width="3" stroke-dasharray="16 10" pathLength="1" style="--d:200"/>
+    <rect x="1080" y="380" width="420" height="300" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.35)" stroke-width="3" class="r s" style="--d:400"/>
+    <path d="M1080 380L1500 680M1500 380L1080 680" stroke="rgba(255,255,255,.12)" stroke-width="2"/>
+    <circle cx="1620" cy="330" r="150" stroke="rgba(255,197,49,.35)" stroke-width="2" stroke-dasharray="6 10" pathLength="1" style="--d:500"/>
+    <g class="r" style="--d:900">
+      <path class="cable" d="M1290 600V780H1000" stroke="#3FD0FF"/><path class="cable" d="M1290 560V330H1580" stroke="#3FD0FF"/>
+      <path class="cable" d="M1330 580H1690V850" stroke="#3FD0FF"/><path class="cable" d="M1250 580H930V330" stroke="#3FD0FF"/>
+    </g>
+  </svg>
+  <div style="font:600 22px/1.3 var(--sans)">
+    <div class="abs glass r s" style="left:900px;top:745px;width:200px;padding:14px 16px;border-radius:14px;--d:1100">Thư mục bản vẽ<br><span class="src" style="font-size:16px">phòng kỹ thuật</span></div>
+    <div class="abs glass r s" style="left:1560px;top:250px;width:210px;padding:14px 16px;border-radius:14px;--d:1200">Camera<br><span class="src" style="font-size:16px">trên cần trục</span></div>
+    <div class="abs glass r s" style="left:1590px;top:830px;width:190px;padding:14px 16px;border-radius:14px;--d:1300">Excel tiến độ<br><span class="src" style="font-size:16px">máy chỉ huy</span></div>
+    <div class="abs glass r s" style="left:880px;top:280px;width:200px;padding:14px 16px;border-radius:14px;--d:1400">Kế toán<br><span class="src" style="font-size:16px">trụ sở, qua mạng</span></div>
+  </div>
+  <p class="abs kick r" style="left:1200px;top:640px;color:rgba(255,255,255,.5);--d:600">tòa nhà đang thi công</p>
+</section>
+
+<!-- 18 SÁNG THỨ HAI: GHÉP BA MẢNH · hoàng hôn -->
+<section class="slide" data-cam="1500" data-ph="dusk" data-time="18:00 · HOÀNG HÔN" data-hat="960 470 1.2 1" data-sun="1500 600">
+  <p class="abs kick r" style="left:120px;top:110px">Ghép ba mảnh</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Cả ngày hôm nay, <em>gói trong một yêu cầu</em></h2>
+  <div class="glass r" style="left:120px;top:270px;width:640px;height:110px;padding:22px 28px;--d:250"><p class="p" style="font-size:27px"><b>Chỉ huy trưởng:</b> "Lập báo cáo tiến độ tuần block B."</p></div>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080" fill="none">
+    <circle cx="960" cy="520" r="120" stroke="rgba(255,138,61,.5)" stroke-width="3" stroke-dasharray="8 10" class="r s" data-step="1"/>
+    <g class="r" data-step="2"><path class="cable" d="M860 520H430" stroke="#FFC531"/></g>
+    <g class="r" data-step="3"><path class="cable" d="M1060 470L1460 360" stroke="#3FD0FF"/><path class="cable" d="M1080 520H1460" stroke="#3FD0FF"/><path class="cable" d="M1060 570L1460 680" stroke="#3FD0FF"/></g>
+    <g class="r" data-step="4"><path class="cable" d="M960 640V780" stroke="#4EE2A0"/></g>
+  </svg>
+  <div class="abs glass r s" data-step="2" style="left:180px;top:440px;width:250px;height:160px;padding:20px;border-color:var(--am)"><p class="mono" style="font-size:18px;color:var(--am)">skill</p><p style="font:800 30px/1.15 var(--sans);margin-top:8px">bao-cao-tuan</p><p style="font:400 19px var(--sans);color:var(--mut);margin-top:6px">mẫu, quy tắc, cách tính</p></div>
+  <div style="font:700 24px/1.2 var(--sans)">
+    <div class="abs glass r rt" data-step="3" style="left:1460px;top:310px;width:300px;padding:16px 20px;border-radius:14px;border-color:var(--cy)">Nhật ký cả tuần</div>
+    <div class="abs glass r rt" data-step="3" style="left:1460px;top:470px;width:300px;padding:16px 20px;border-radius:14px;border-color:var(--cy)">Bảng tiến độ Excel</div>
+    <div class="abs glass r rt" data-step="3" style="left:1460px;top:630px;width:300px;padding:16px 20px;border-radius:14px;border-color:var(--cy)">Ảnh camera</div>
+  </div>
+  <div class="abs r dn" data-step="4" style="left:760px;top:780px;width:400px;height:200px;border-radius:14px;background:#F5F1E8;color:#1b1f2a;padding:20px 26px;box-shadow:0 30px 60px -20px rgba(0,0,0,.8)">
+    <p class="mono" style="font-size:16px;color:#6a6f7d">BÁO CÁO TUẦN · BLOCK B</p>
+    <div style="height:8px;border-radius:4px;background:#d8d2c4;margin-top:16px"></div><div style="height:8px;width:80%;border-radius:4px;background:#d8d2c4;margin-top:12px"></div><div style="height:8px;width:65%;border-radius:4px;background:#d8d2c4;margin-top:12px"></div>
+  </div>
+  <div class="abs stamp" data-step="4" style="left:1060px;top:880px;--d:500;border:5px solid #FF5468;color:#FF5468;font:900 30px var(--mono);padding:8px 18px;border-radius:8px;letter-spacing:.08em;background:rgba(20,8,12,.6)">CHỜ DUYỆT</div>
+  <div class="abs" style="left:120px;top:440px;width:0"></div>
+  <p class="abs src r" style="left:120px;top:965px;--d:600">Bấm 4 lần: Agent nhận việc · mở Skill · qua MCP đọc dữ liệu · nháp chờ duyệt.</p>
+</section>
+
+<!-- 19 BẮT ĐẦU VÀ BIỂN BÁO AN TOÀN -->
+<section class="slide" data-cam="1580" data-ph="dusk" data-time="18:40 · CHẠNG VẠNG" data-hat="690 470 1 1" data-sun="1560 650">
+  <p class="abs kick r" style="left:120px;top:110px">Bắt đầu thế nào</p>
+  <h2 class="abs h r" style="left:120px;top:145px;--d:80">Ba bậc lên, <em style="color:var(--am)">bốn biển báo</em></h2>
+  <div style="font:700 24px/1.3 var(--sans)">
+    <div class="abs r dn" style="left:120px;top:760px;width:220px;height:150px;border-radius:12px 12px 0 0;background:linear-gradient(180deg,#FFC531,#c98a15);color:#1b1306;padding:18px;--d:300">1 · Một skill<br><span style="font:500 19px var(--sans)">việc lặp lại nhiều nhất</span></div>
+    <div class="abs r dn" style="left:350px;top:640px;width:220px;height:270px;border-radius:12px 12px 0 0;background:linear-gradient(180deg,#3FD0FF,#1b7ea6);color:#04202c;padding:18px;--d:550">2 · Một MCP<br><span style="font:500 19px var(--sans)">chỉ đọc trước</span></div>
+    <div class="abs r dn" style="left:580px;top:520px;width:220px;height:390px;border-radius:12px 12px 0 0;background:linear-gradient(180deg,#4EE2A0,#1f8a5b);color:#03231a;padding:18px;--d:800">3 · Agent làm nháp<br><span style="font:500 19px var(--sans)">người duyệt, đo kết quả</span></div>
+  </div>
+  <div class="sign r dn" style="left:880px;top:270px;--d:1000"><svg width="56" height="50"><path d="M28 3L54 47H2Z" fill="none" stroke="#14161c" stroke-width="5" stroke-linejoin="round"/><path d="M28 18V32M28 38V40" stroke="#14161c" stroke-width="5" stroke-linecap="round"/></svg><h4>Nguồn tin cậy</h4><p>Chỉ cài skill, MCP từ nguồn tin cậy: chúng chạy được mã như phần mềm.</p></div>
+  <div class="sign r dn" style="left:1300px;top:270px;--d:1150"><svg width="56" height="56"><rect x="8" y="24" width="40" height="28" rx="5" fill="none" stroke="#14161c" stroke-width="5"/><path d="M16 24V16a12 12 0 0 1 24 0v8" fill="none" stroke="#14161c" stroke-width="5"/></svg><h4>Quyền tối thiểu</h4><p>Tách quyền đọc và ghi. Mở dần khi đã quen.</p></div>
+  <div class="sign r dn" style="left:880px;top:630px;--d:1300"><svg width="56" height="56"><circle cx="28" cy="28" r="24" fill="none" stroke="#14161c" stroke-width="5"/><path d="M12 12L44 44" stroke="#14161c" stroke-width="5"/></svg><h4>Người duyệt</h4><p>Gửi ra ngoài, ký, chi tiền: luôn có người bấm duyệt.</p></div>
+  <div class="sign r dn" style="left:1300px;top:630px;--d:1450"><svg width="56" height="56"><path d="M8 48H48M14 48V20M28 48V10M42 48V28" fill="none" stroke="#14161c" stroke-width="5" stroke-linecap="round"/></svg><h4>Số có nguồn</h4><p>Mọi con số trong báo cáo phải dẫn tới tờ, ô, file gốc.</p></div>
+</section>
+
+<!-- 20 KẾT · đêm, cả tòa nhà lên đèn -->
+<section class="slide" data-cam="1710" data-ph="night" data-time="21:00 · ĐÊM" data-hat="1650 300 1.1 1" data-sun="1700 140">
+  <div class="abs" style="left:-200px;top:140px;width:1700px;height:900px;background:radial-gradient(ellipse at 38% 48%,rgba(3,5,12,.86) 0%,rgba(3,5,12,.66) 42%,rgba(3,5,12,0) 70%)"></div>
+  <h2 class="abs r b" style="left:120px;top:260px;font:900 92px/1.15 var(--sans);letter-spacing:-.03em;--d:200"><span class="ag">AGENT</span> làm việc.</h2>
+  <h2 class="abs r b" style="left:120px;top:400px;font:900 92px/1.15 var(--sans);letter-spacing:-.03em;--d:700"><span class="sk">SKILL</span> dạy cách làm.</h2>
+  <h2 class="abs r b" style="left:120px;top:540px;font:900 92px/1.15 var(--sans);letter-spacing:-.03em;--d:1200"><span class="mc">MCP</span> mở cửa vào dữ liệu.</h2>
+  <p class="abs p r" style="left:124px;top:720px;width:1100px;font-size:36px;--d:1800">Con người đặt mục tiêu và <b>bấm duyệt</b>. Kỹ sư quay về công trường.</p>
+  <p class="abs src r" style="left:120px;top:930px;width:1680px;--d:2300">Tham khảo, tra ngày 16/10/2026: modelcontextprotocol.io/docs/getting-started/intro · modelcontextprotocol.io/docs/learn/architecture · platform.claude.com/docs/en/agents-and-tools/agent-skills/overview</p>
+</section>
+
+  <svg id="hat" viewBox="0 0 140 96">
+    <defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC27A"/><stop offset=".55" stop-color="#FF8A3D"/><stop offset="1" stop-color="#D9621F"/></linearGradient></defs>
+    <g class="bob">
+      <path d="M22 66C22 34 44 14 70 14S118 34 118 66Z" fill="url(#hg)"/>
+      <path d="M62 14C62 30 60 50 58 66M78 14C78 30 80 50 82 66" stroke="#FFD9A8" stroke-width="5" fill="none" opacity=".7"/>
+      <path d="M8 66H132C134 66 136 72 132 74H8C4 72 6 66 8 66Z" fill="#E86E22"/>
+      <ellipse cx="70" cy="86" rx="40" ry="5" fill="#FF8A3D" opacity=".35"/>
+    </g>
+  </svg>
+</div>
+
+<script>
+/* toàn cảnh công trường: sinh dãy phố xa, tòa nhà đang thi công, cần trục, rào chắn */
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', el = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); p.append(e); return e; };
+  let seed = 11; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const far = document.getElementById('far'), mid = document.getElementById('mid'), near = document.getElementById('near');
+  for (let x = 0; x < 3840;) { const w = 60 + rnd() * 140, h = 120 + rnd() * 260; el('rect', { x, y: 1080 - 230 - h, width: w, height: h + 230 }, far); x += w + rnd() * 30; }
+  // phố gần, có cửa sổ để thắp đèn ban đêm
+  for (let x = 0; x < 3840;) {
+    const w = 120 + rnd() * 200, h = 160 + rnd() * 300, y = 1080 - 120 - h;
+    el('rect', { x, y, width: w, height: h + 120, class: 'sil' }, mid);
+    for (let wy = y + 24; wy < 1080 - 150; wy += 34) for (let wx = x + 16; wx < x + w - 24; wx += 30)
+      if (rnd() < .45) el('rect', { x: wx, y: wy, width: 12, height: 16, class: 'win' + (rnd() < .4 ? ' a' : '') }, mid);
+    x += w + 40 + rnd() * 120;
+  }
+  // tòa nhà đang thi công + cần trục, nhắc lại ba lần dọc toàn cảnh
+  [700, 1900, 3100].forEach((bx, k) => {
+    const floors = 9 + k * 2, fh = 46, top = 1080 - 120 - floors * fh;
+    el('rect', { x: bx, y: top, width: 360, height: floors * fh + 120, class: 'sil' }, mid);
+    for (let f = 0; f < floors; f++) for (let c = 0; c < 8; c++) if (rnd() < .6) el('rect', { x: bx + 18 + c * 42, y: top + 12 + f * fh, width: 24, height: 22, class: 'win' + (rnd() < .5 ? ' a' : '') }, mid);
+    const mx = bx + 430, my = top - 260;
+    el('path', { d: `M${mx} 1080V${my}M${mx + 26} 1080V${my}`, class: 'frame', stroke: '#0b1226' }, mid);
+    let z = ''; for (let y = 1080; y > my; y -= 40) z += `M${mx} ${y}L${mx + 26} ${y - 40}`;
+    el('path', { d: z, class: 'frame', 'stroke-width': 3 }, mid);
+    el('path', { d: `M${mx - 360} ${my}H${mx + 160}M${mx + 13} ${my - 60}L${mx - 360} ${my}M${mx + 13} ${my - 60}L${mx + 160} ${my}`, class: 'frame', 'stroke-width': 5 }, mid);
+    el('path', { d: `M${mx - 200} ${my}V${my + 180}`, class: 'frame', 'stroke-width': 2 }, mid);
+    el('rect', { x: mx - 240, y: my + 180, width: 80, height: 20, class: 'sil' }, mid);
+  });
+  // rào công trường, đèn cảnh báo
+  el('rect', { x: 0, y: 1080 - 70, width: 3840, height: 70, class: 'g' }, near);
+  for (let x = 0; x < 3840; x += 220) {
+    el('rect', { x, y: 1080 - 130, width: 200, height: 60, class: 'g' }, near);
+    el('circle', { cx: x + 100, cy: 1080 - 140, r: 5, fill: '#FF8A3D', opacity: .8 }, near);
+  }
+})();
+</script>
+<script>
+/* trình chiếu: co khung, điều hướng, bấm từng bước, máy quay lia, trời đổi giờ, mũ bảo hộ đi theo */
+(() => {
+  const stage = document.getElementById('stage'), slides = [...stage.querySelectorAll('.slide')], N = slides.length;
+  const far = document.getElementById('far'), mid = document.getElementById('mid'), near = document.getElementById('near');
+  const sun = document.getElementById('sun'), hat = document.getElementById('hat'), clock = document.getElementById('clock'), bar = document.querySelector('#bar i');
+  const phs = [...document.querySelectorAll('.ph')];
+  let cur = -1, step = 0, first = true;
+  const fit = () => { const s = Math.min(innerWidth / 1920, innerHeight / 1080); Object.assign(stage.style, { transform: `scale(${s})`, left: (innerWidth - 1920 * s) / 2 + 'px', top: (innerHeight - 1080 * s) / 2 + 'px' }); };
+  const maxStep = s => Math.max(0, ...[...s.querySelectorAll('[data-step]')].map(e => +e.dataset.step));
+  const show = (s, n) => s.querySelectorAll('[data-step]').forEach(e => e.classList.toggle('shown', +e.dataset.step <= n));
+  function go(n, full = false) {
+    n = Math.max(0, Math.min(N - 1, n)); if (n === cur) return;
+    if (cur >= 0) slides[cur].classList.remove('on');
+    cur = n; const s = slides[n]; step = full ? maxStep(s) : 0; show(s, step); s.classList.add('on');
+    const cam = +s.dataset.cam;
+    far.style.transform = `translateX(${-cam * .3}px)`; mid.style.transform = `translateX(${-cam * .6}px)`; near.style.transform = `translateX(${-cam}px)`;
+    phs.forEach(p => p.classList.toggle('on', p.classList.contains(s.dataset.ph)));
+    stage.dataset.light = s.dataset.ph === 'night' ? 2 : s.dataset.ph === 'dusk' ? 1 : 0;
+    const [sx, sy] = s.dataset.sun.split(' ').map(Number);
+    sun.style.transform = `translate(${sx - 210}px,${sy - 210}px)`;
+    sun.style.opacity = s.dataset.ph === 'night' ? .35 : 1;
+    sun.style.background = s.dataset.ph === 'night' ? 'radial-gradient(circle,rgba(230,236,255,.9) 0 9%,rgba(180,200,255,.25) 18%,rgba(180,200,255,0) 50%)' : '';
+    const [hx, hy, hk, ho] = s.dataset.hat.split(' ').map(Number);
+    if (first) hat.style.transition = 'none';
+    hat.style.transform = `translate(${hx - 70}px,${hy - 60}px) scale(${hk})`; hat.style.opacity = ho;
+    if (first) { hat.getBoundingClientRect(); hat.style.transition = ''; first = false; }
+    clock.textContent = s.dataset.time; bar.style.width = ((n + 1) / N * 100) + '%';
+    history.replaceState(null, '', '#' + (n + 1));
+  }
+  const next = () => step < maxStep(slides[cur]) ? show(slides[cur], ++step) : go(cur + 1);
+  const prev = () => step > 0 ? show(slides[cur], --step) : go(cur - 1, true);
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') go(0); else if (e.key === 'End') go(N - 1, true);
+    else if (e.key === 'f' || e.key === 'F') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  });
+  addEventListener('click', e => { if (String(getSelection())) return; e.clientX > innerWidth / 3 ? next() : prev(); });
+  let tx = null; addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  addEventListener('touchend', e => { if (tx === null) return; const d = e.changedTouches[0].clientX - tx; if (Math.abs(d) > 40) d < 0 ? next() : prev(); tx = null; });
+  addEventListener('resize', fit); fit();
+  window.deck = { go: i => go(i, true), next, prev, get index() { return cur; }, slides };
+  go((parseInt(location.hash.slice(1)) || 1) - 1);
+})();
+</script>
+</body>
+</html>

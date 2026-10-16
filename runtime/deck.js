@@ -5,6 +5,8 @@
    - data-morph="id": same id on consecutive slides glides between positions (Morph by name)
    - data-count="1234": number counts up on entry
    - copies the slide's data-scene onto the stage, so persistent layers can morph with plain CSS
+   - data-cam on a slide + data-parallax="0.3..1" on background layers: camera pan with depth
+   - print (Ctrl+P): every slide on its own page, every step shown, no motion: a handout
    No layouts, no frames: every slide is designed by the author. */
 (() => {
   const W = 1920, H = 1080;
@@ -30,7 +32,7 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
 [data-anim=rise-wipe]{clip-path:inset(100% 0 0 0)}
 [data-anim=stamp]{opacity:0;transform:scale(2.4) rotate(-14deg)}
 [data-anim=draw]{stroke-dasharray:1;stroke-dashoffset:1}
-.on [data-anim]:not([data-step]),.on [data-anim].sm-shown{opacity:1;transform:none;filter:none;clip-path:inset(0 0 0 0);stroke-dashoffset:0;
+.on [data-anim]:not([data-step]),.on [data-anim].sm-shown{opacity:1;transform:none;filter:none;clip-path:inset(-400px -400px -400px -400px);stroke-dashoffset:0;
   transition:opacity var(--sm-t,800ms) var(--sm-ease) var(--sm-d,0ms),transform var(--sm-t,800ms) var(--sm-ease) var(--sm-d,0ms),
   filter var(--sm-t,800ms) var(--sm-ease) var(--sm-d,0ms),clip-path var(--sm-t,900ms) var(--sm-ease) var(--sm-d,0ms),
   stroke-dashoffset var(--sm-t,1400ms) var(--sm-ease) var(--sm-d,0ms)}
@@ -52,7 +54,14 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
 @keyframes sm-scan{from{transform:translateY(0)}to{transform:translateY(var(--sm-scan,400px))}}
 @keyframes sm-wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 @keyframes sm-zoomin{from{transform:scale(1.08);filter:blur(6px)}to{transform:none;filter:none}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}`;
+[data-parallax]{transition:transform 1.6s cubic-bezier(.65,0,.25,1)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{@page{size:16in 9in;margin:0}
+ html,body{height:auto;overflow:visible;overflow-x:hidden;background:#fff}
+ .sm-stage{position:relative!important;transform:none!important;left:0!important;top:0!important;height:auto!important;overflow:hidden!important;zoom:.8}
+ .sm-stage>.slide{position:relative!important;visibility:visible!important;opacity:1!important;height:1080px;overflow:hidden;break-after:page}
+ [data-anim],[data-step]{opacity:1!important;transform:none!important;filter:none!important;clip-path:none!important;stroke-dashoffset:0!important}
+ *{animation:none!important;transition:none!important}}`;
   document.head.insertAdjacentHTML('beforeend', `<style id="sm-base">${css}</style>`);
 
   const stage = document.querySelector('.sm-stage');
@@ -129,6 +138,9 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
     stage.dataset.slide = n + 1;
     stage.dataset.scene = next.dataset.scene || n + 1;
     stage.style.setProperty('--sm-progress', slides.length > 1 ? n / (slides.length - 1) : 1);
+    if (next.dataset.cam !== undefined) stage.querySelectorAll('[data-parallax]').forEach(l => {
+      l.style.transform = `translateX(${-(+next.dataset.cam) * +l.dataset.parallax}px)`;
+    });
     count(next);
     history.replaceState(null, '', '#' + (n + 1));
     stage.dispatchEvent(new CustomEvent('sm:change', { detail: { index: n, slide: next } }));

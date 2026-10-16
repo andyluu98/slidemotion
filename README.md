@@ -8,11 +8,13 @@ SlideMotion là một skill cho Claude Code (và các agent đọc được SKIL
 
 | Thư mục | Nội dung |
 |---|---|
-| `SKILL.md` | Tinh thần, quy trình 6 bước, bảng tự soát |
+| `SKILL.md` | Tinh thần, quy trình (chọn chế độ, ý tưởng lớn, kịch bản đạo diễn, dựng, tự soát, bàn giao) |
+| `modes/` | Ba chế độ: `giang-day` (dạy lý thuyết), `bao-cao` (trình bày kết quả), `su-kien` (ra mắt, pitch) |
+| `scenes/canh-mau.html` | 13 cảnh dùng lại: bản đồ buổi học, khung kiến thức, câu hỏi kiểm tra, chỉ số có nguồn, biểu đồ một thông điệp, bảng khuyến nghị, toàn cảnh lia, cửa sổ chat, terminal |
 | `styles/` | `INDEX.md` để chọn style, mỗi style một thẻ gợi ý (màu, chữ, ngôn ngữ minh họa, chữ ký chuyển động, khoảnh khắc đáng nhớ) |
 | `motion/tu-dien.md` | Động từ của ý, hiệu ứng HTML tương ứng, hiệu ứng PowerPoint tương ứng |
-| `runtime/deck.js` | Co khung 16:9, điều hướng, `data-anim`, `data-loop`, `data-step`, `data-morph`, `data-count` |
-| `examples/` | Cùng một nội dung "AI Agent cho xây dựng" dựng ở hai style khác hẳn nhau |
+| `runtime/deck.js` | Co khung 16:9, điều hướng, `data-anim`, `data-loop`, `data-step`, `data-morph`, `data-count`, toàn cảnh lia (`data-cam`, `data-parallax`), in bản phát tay (Ctrl+P) |
+| `examples/` | Cùng chủ đề AI trong xây dựng, dựng theo ba cách khác hẳn nhau (blueprint, bảng trắng, "một ngày ở công trường") |
 
 ## Cài vào Claude Code
 
@@ -22,6 +24,7 @@ Chép thư mục repo vào `~/.claude/skills/slidemotion`, rồi nói: "làm sli
 
 - [x] Giai đoạn 1: runtime, SKILL.md, từ điển chuyển động, 5 thẻ style thử, 2 deck mẫu
 - [x] Giai đoạn 2: đủ 85 thẻ style
+- [x] Ba chế độ: giảng dạy, báo cáo, sự kiện; cảnh mẫu; in bản phát tay
 - [ ] Giai đoạn 3: xuất PowerPoint giữ hiệu ứng tương ứng
 - [ ] Giai đoạn 4: GIF demo, trang giới thiệu
 

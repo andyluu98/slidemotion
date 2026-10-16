@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SlideMotion · cảnh mẫu</title>
+<!-- Thư viện cảnh dùng lại được. Mỗi cảnh nằm giữa hai dòng chú thích "CẢNH: ...".
+     Chép cảnh sang deck của bạn rồi đổi màu, chữ, hình theo thẻ style. Đây là đồ vật để dựng cảnh, không phải khung bố cục.
+     Số liệu trong các cảnh báo cáo là MINH HỌA. -->
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+.sm-stage { --ink:#1d2433; --mut:#5b6478; --line:#d9dee8; --acc:#2563eb; --ok:#16a34a; --warn:#ea580c; --paper:#f7f8fb;
+  --sans:'Be Vietnam Pro',sans-serif; --mono:'JetBrains Mono',monospace;
+  font-family:var(--sans); color:var(--ink); background:var(--paper); transition:background .8s; }
+.sm-stage[data-scene=su-kien] { background:#070b16; color:#f2f4f8; }
+.abs { position:absolute; margin:0; }
+.tag { position:absolute; left:120px; top:46px; margin:0; font:600 18px var(--mono); letter-spacing:.14em; color:var(--mut); text-transform:uppercase; }
+.h { position:absolute; left:120px; top:90px; margin:0; font:800 64px/1.12 var(--sans); letter-spacing:-.02em; max-width:1600px; }
+.p { font:400 30px/1.5 var(--sans); color:#39414f; }
+.src { font:400 19px/1.4 var(--mono); color:var(--mut); }
+.card { position:absolute; background:#fff; border:1px solid var(--line); border-radius:20px; box-shadow:0 20px 40px -24px rgba(20,30,60,.35); padding:34px; box-sizing:border-box; }
+
+/* ---------- CẢNH: Bản đồ buổi học ---------- */
+.map { position:absolute; left:120px; right:120px; top:420px; display:flex; justify-content:space-between; }
+.map .st { width:300px; text-align:center; font:600 28px/1.3 var(--sans); color:var(--mut); }
+.map .st i { display:block; width:60px; height:60px; margin:0 auto 18px; border-radius:50%; border:4px solid var(--line); background:#fff; font:700 26px/52px var(--sans); font-style:normal; color:var(--mut); }
+.map .st.now { color:var(--ink); } .map .st.now i { border-color:var(--acc); background:var(--acc); color:#fff; box-shadow:0 0 0 10px rgba(37,99,235,.15); }
+.map .st.done i { border-color:var(--ok); color:var(--ok); }
+/* ---------- CẢNH: Câu hỏi kiểm tra ---------- */
+.opt { position:absolute; left:120px; width:1100px; padding:24px 30px; border:2px solid var(--line); border-radius:16px; background:#fff; font:500 32px var(--sans); box-sizing:border-box; transition:border-color .4s, background .4s; }
+.opt b { display:inline-block; width:54px; color:var(--mut); }
+.sm-stage .slide.q-ok .opt.right { border-color:var(--ok); background:#ecfdf3; }
+/* ---------- CẢNH: Biểu đồ cột ---------- */
+.bars { position:absolute; left:160px; right:620px; top:300px; height:560px; display:flex; align-items:flex-end; gap:40px; border-bottom:3px solid var(--ink); }
+.bars div { flex:1; position:relative; border-radius:10px 10px 0 0; background:#c9d1df; }
+.bars div.hot { background:var(--warn); }
+.bars span { position:absolute; left:0; right:0; bottom:-56px; text-align:center; font:500 24px var(--sans); color:var(--mut); }
+.bars em { position:absolute; left:0; right:0; top:-46px; text-align:center; font:700 28px var(--sans); font-style:normal; }
+/* ---------- CẢNH: Bảng so sánh ---------- */
+.cmp { position:absolute; left:120px; top:280px; width:1680px; border-collapse:collapse; font:400 28px var(--sans); }
+.cmp th, .cmp td { padding:22px 26px; border-bottom:1px solid var(--line); text-align:left; }
+.cmp th { font:600 22px var(--mono); color:var(--mut); letter-spacing:.06em; }
+.cmp .pick { background:#eef4ff; border-left:4px solid var(--acc); border-right:4px solid var(--acc); }
+.cmp thead .pick { border-top:4px solid var(--acc); color:var(--acc); }
+.cmp tbody tr:last-child .pick { border-bottom:4px solid var(--acc); }
+/* ---------- CẢNH: Toàn cảnh lia ---------- */
+.pan { position:absolute; left:0; bottom:0; width:3840px; height:1080px; opacity:0; transition:opacity .8s, transform 1.6s cubic-bezier(.65,0,.25,1); pointer-events:none; }
+.sm-stage[data-scene=su-kien] .pan { opacity:1; }
+/* ---------- CẢNH: Cửa sổ ứng dụng (chat, terminal) ---------- */
+.win { position:absolute; background:rgba(12,16,28,.92); border:1px solid rgba(255,255,255,.14); border-radius:18px; overflow:hidden; box-shadow:0 40px 90px -30px rgba(0,0,0,.9); color:#e6eaf2; }
+.win .tb { height:50px; display:flex; align-items:center; gap:10px; padding:0 20px; border-bottom:1px solid rgba(255,255,255,.08); font:600 17px var(--mono); color:#9aa6bd; }
+.win .tb i { width:13px; height:13px; border-radius:50%; background:#ff5f57; } .win .tb i:nth-child(2){background:#febc2e} .win .tb i:nth-child(3){background:#28c840;margin-right:12px}
+.bub { max-width:620px; padding:16px 22px; border-radius:20px; font:400 27px/1.45 var(--sans); margin:0 0 16px; }
+.bub.me { background:#2563eb; margin-left:auto; border-bottom-right-radius:6px; width:fit-content; }
+.bub.bot { background:rgba(255,255,255,.09); border-bottom-left-radius:6px; width:fit-content; }
+.log { padding:24px 30px; font:400 27px/1.85 var(--mono); }
+.log p { margin:0; } .log .ok { color:#4ade80; } .log .go { color:#fb923c; }
+</style>
+</head>
+<body>
+<div class="sm-stage">
+
+  <!-- lớp nền toàn cảnh (dùng cho cảnh "Toàn cảnh lia"): đặt ngoài slide, ghi data-parallax -->
+  <svg class="pan" data-parallax="0.3" viewBox="0 0 3840 1080"><g fill="#121a30" id="farCity"></g></svg>
+  <svg class="pan" data-parallax="0.7" viewBox="0 0 3840 1080"><g fill="#0b1122" id="nearCity"></g></svg>
+
+  <!-- ====== GIẢNG DẠY ====== -->
+  <!-- CẢNH: Bìa câu hỏi lớn · giảng dạy -->
+  <section class="slide" data-scene="giang-day">
+    <p class="tag" data-anim="fade">Giảng dạy · bìa câu hỏi lớn</p>
+    <p class="abs" style="left:120px;top:300px;font:600 30px var(--sans);color:var(--acc)" data-anim="fade" data-delay="200">Buổi 3 · AI trong xây dựng</p>
+    <h1 class="abs" style="left:116px;top:350px;width:1500px;font:900 104px/1.08 var(--sans);letter-spacing:-.03em" data-anim="wipe" data-delay="300">Làm sao để AI <span style="color:var(--acc)">làm việc thật</span> ở công trường?</h1>
+    <p class="abs p" style="left:120px;top:660px;width:1200px" data-anim="rise" data-delay="900">Cuối buổi, mỗi học viên trả lời được câu này bằng lời của mình.</p>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- CẢNH: Bản đồ buổi học · giảng dạy (lặp lại ở đầu mỗi phần, đổi lớp now/done) -->
+  <section class="slide" data-scene="giang-day">
+    <p class="tag" data-anim="fade">Giảng dạy · bản đồ buổi học</p>
+    <h2 class="h" data-anim="wipe">Hôm nay đi qua bốn trạm</h2>
+    <svg class="abs" style="left:270px;top:448px" width="1380" height="10"><path d="M0 5H1380" stroke="#d9dee8" stroke-width="6" data-anim="draw"/><path d="M0 5H460" stroke="#16a34a" stroke-width="6" data-anim="draw" data-delay="300"/></svg>
+    <div class="map" data-stagger="150" data-delay="300">
+      <div class="st done" data-anim="pop"><i>✓</i>Vấn đề của chatbot</div>
+      <div class="st now" data-anim="pop"><i>2</i>Agent</div>
+      <div class="st" data-anim="pop"><i>3</i>Skill</div>
+      <div class="st" data-anim="pop"><i>4</i>MCP</div>
+    </div>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- CẢNH: Khung kiến thức (định nghĩa, ví von, ví dụ) · giảng dạy · bấm từng bước -->
+  <section class="slide" data-scene="giang-day">
+    <p class="tag" data-anim="fade">Giảng dạy · khung kiến thức, bấm từng bước</p>
+    <h2 class="h" data-anim="wipe">Skill là gì?</h2>
+    <div class="card" style="left:120px;top:270px;width:520px;height:560px;border-top:8px solid var(--acc)" data-anim="rise"><p class="src">1 · ĐỊNH NGHĨA</p><p class="p" style="margin-top:16px">Một thư mục chứa <b>hướng dẫn, mã, tài liệu</b>. AI tự lấy ra dùng khi việc phù hợp.</p></div>
+    <div class="card" style="left:700px;top:270px;width:520px;height:560px;border-top:8px solid #f59e0b" data-step="1" data-anim="rise"><p class="src">2 · VÍ VON</p><p class="p" style="margin-top:16px">Giống bộ tài liệu công ty soạn cho <b>nhân viên mới</b>.</p></div>
+    <div class="card" style="left:1280px;top:270px;width:520px;height:560px;border-top:8px solid var(--ok)" data-step="2" data-anim="rise"><p class="src">3 · VÍ DỤ TRONG NGHỀ</p><p class="p" style="margin-top:16px">Skill <b>nhat-ky-thi-cong</b>: gom ảnh, tin nhắn thành nhật ký đúng mẫu.</p></div>
+    <p class="abs src" style="left:120px;top:900px" data-anim="fade" data-delay="600">Bấm để mở ví von, bấm tiếp để mở ví dụ.</p>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- CẢNH: Câu hỏi kiểm tra · giảng dạy · bấm để hiện đáp án -->
+  <section class="slide" data-scene="giang-day" data-quiz>
+    <p class="tag" data-anim="fade">Giảng dạy · câu hỏi kiểm tra</p>
+    <h2 class="h" data-anim="wipe">Muốn AI đọc file Excel tiến độ, cần mảnh nào?</h2>
+    <div class="opt" style="top:330px" data-anim="left" data-delay="300"><b>A</b>Một skill viết thật dài</div>
+    <div class="opt right" style="top:470px" data-anim="left" data-delay="450"><b>B</b>Một server MCP nối tới file Excel</div>
+    <div class="opt" style="top:610px" data-anim="left" data-delay="600"><b>C</b>Hỏi chatbot nhiều lần hơn</div>
+    <p class="abs" style="left:1260px;top:470px;width:540px;font:500 28px/1.45 var(--sans);color:var(--ok)" data-step="1" data-anim="right">✓ Đúng là B. Skill dạy cách làm, còn MCP mới mở đường vào dữ liệu.</p>
+    <p class="abs src" style="left:120px;top:900px" data-anim="fade" data-delay="800">Để học viên trả lời trước, rồi bấm để hiện đáp án.</p>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- CẢNH: Tóm tắt cuối phần · giảng dạy -->
+  <section class="slide" data-scene="giang-day">
+    <p class="tag" data-anim="fade">Giảng dạy · tóm tắt cuối phần</p>
+    <h2 class="h" data-anim="wipe">Nhớ ba điều</h2>
+    <div data-stagger="250" data-delay="300">
+      <p class="abs" style="left:120px;top:300px;font:700 52px/1.3 var(--sans)" data-anim="rise"><span style="color:var(--acc)">1.</span> Agent làm việc tới khi xong.</p>
+      <p class="abs" style="left:120px;top:440px;font:700 52px/1.3 var(--sans)" data-anim="rise"><span style="color:var(--acc)">2.</span> Skill dạy cách làm của công ty.</p>
+      <p class="abs" style="left:120px;top:580px;font:700 52px/1.3 var(--sans)" data-anim="rise"><span style="color:var(--acc)">3.</span> MCP mở đường vào dữ liệu.</p>
+    </div>
+    <p class="abs src" style="left:120px;top:900px" data-anim="fade" data-delay="1200">Slide để học viên chụp lại.</p>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- ====== BÁO CÁO ====== -->
+  <!-- CẢNH: Chỉ số có nguồn · báo cáo -->
+  <section class="slide" data-scene="bao-cao">
+    <p class="tag" data-anim="fade">Báo cáo · chỉ số có nguồn (số minh họa)</p>
+    <h2 class="h" data-anim="wipe">Tuần 42: tiến độ block B chậm hơn kế hoạch</h2>
+    <div class="card" style="left:120px;top:300px;width:520px;height:470px" data-anim="rise" data-delay="200"><p class="src">KHỐI LƯỢNG ĐẠT</p><p style="font:900 140px/1.1 var(--sans);margin-top:20px"><span data-count="86">86</span><span style="font-size:70px">%</span></p><p class="src" style="margin-top:20px">Nguồn: tien-do-blockB.xlsx, sheet Tuan42, ô F12</p></div>
+    <div class="card" style="left:700px;top:300px;width:520px;height:470px;border-color:var(--warn)" data-anim="rise" data-delay="350"><p class="src" style="color:var(--warn)">HẠNG MỤC CHẬM</p><p style="font:900 140px/1.1 var(--sans);margin-top:20px;color:var(--warn)"><span data-count="2">2</span></p><p class="src" style="margin-top:20px">Nguồn: nhật ký thi công tuần 42</p></div>
+    <div class="card" style="left:1280px;top:300px;width:520px;height:470px" data-anim="rise" data-delay="500"><p class="src">NGÀY MƯA NGHỈ</p><p style="font:900 140px/1.1 var(--sans);margin-top:20px"><span data-count="3">3</span></p><p class="src" style="margin-top:20px">Nguồn: nhật ký thi công tuần 42</p></div>
+    <p class="abs src" style="left:120px;top:900px" data-anim="fade" data-delay="900">Tiêu đề là câu kết luận; mỗi số có nguồn ngay dưới. Toàn bộ số ở đây là minh họa.</p>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- CẢNH: Biểu đồ cột một thông điệp · báo cáo -->
+  <section class="slide" data-scene="bao-cao">
+    <p class="tag" data-anim="fade">Báo cáo · biểu đồ một thông điệp (số minh họa)</p>
+    <h2 class="h" data-anim="wipe">Xây tường tầng 4 là hạng mục kéo chậm cả tuần</h2>
+    <div class="bars" data-stagger="150" data-delay="300">
+      <div style="height:92%" data-anim="rise-wipe"><em>92%</em><span>Cốt thép</span></div>
+      <div style="height:88%" data-anim="rise-wipe"><em>88%</em><span>Bê tông</span></div>
+      <div class="hot" style="height:54%" data-anim="rise-wipe"><em style="color:var(--warn)">54%</em><span style="color:var(--warn);font-weight:700">Xây tường T4</span></div>
+      <div style="height:80%" data-anim="rise-wipe"><em>80%</em><span>Điện nước</span></div>
+    </div>
+    <div class="card" style="left:1360px;top:320px;width:440px;height:auto" data-anim="right" data-delay="1100"><p class="p" style="font-size:27px">Thiếu 2 thợ nề và 3 ngày mưa. <b>Đề xuất:</b> tăng ca thứ Bảy, bổ sung tổ thợ.</p></div>
+    <p class="abs src" style="left:160px;top:960px" data-anim="fade" data-delay="1300">Tỷ lệ khối lượng đạt so kế hoạch tuần. Nguồn: tien-do-blockB.xlsx, sheet Tuan42 (minh họa).</p>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- CẢNH: Bảng so sánh có khuyến nghị · báo cáo -->
+  <section class="slide" data-scene="bao-cao">
+    <p class="tag" data-anim="fade">Báo cáo · bảng so sánh có khuyến nghị</p>
+    <h2 class="h" data-anim="wipe">Nên bắt đầu bằng phương án B</h2>
+    <table class="cmp" data-anim="fade" data-delay="300">
+      <thead><tr><th></th><th>A · Chatbot</th><th class="pick">B · Agent + Skill</th><th>C · Agent + Skill + MCP</th></tr></thead>
+      <tbody>
+        <tr><td>Làm việc nhiều bước</td><td>Không</td><td class="pick">Có</td><td>Có</td></tr>
+        <tr><td>Theo quy trình công ty</td><td>Không</td><td class="pick">Có</td><td>Có</td></tr>
+        <tr><td>Tự đọc dữ liệu phần mềm</td><td>Không</td><td class="pick">Dán tay</td><td>Có</td></tr>
+        <tr><td>Thời gian triển khai</td><td>Ngay</td><td class="pick">Vài ngày</td><td>Vài tuần</td></tr>
+      </tbody>
+    </table>
+    <p class="abs src" style="left:120px;top:900px" data-anim="fade" data-delay="900">Cột được khuyến nghị đóng khung. Thời gian triển khai là ước lượng minh họa.</p>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- CẢNH: Đề xuất việc, người, hạn · báo cáo -->
+  <section class="slide" data-scene="bao-cao">
+    <p class="tag" data-anim="fade">Báo cáo · đề xuất: việc, người, hạn</p>
+    <h2 class="h" data-anim="wipe">Ba việc cho tuần tới</h2>
+    <div data-stagger="200" data-delay="300">
+      <div class="card" style="left:120px;top:280px;width:1680px;height:150px;display:flex;align-items:center;gap:40px" data-anim="left"><b style="font:800 34px var(--sans);width:900px">Viết skill bao-cao-tuan</b><span class="p" style="width:400px">Phòng kỹ thuật</span><span class="p">Thứ Tư</span></div>
+      <div class="card" style="left:120px;top:460px;width:1680px;height:150px;display:flex;align-items:center;gap:40px" data-anim="left"><b style="font:800 34px var(--sans);width:900px">Nối MCP chỉ đọc vào thư mục nhật ký</b><span class="p" style="width:400px">IT dự án</span><span class="p">Thứ Sáu</span></div>
+      <div class="card" style="left:120px;top:640px;width:1680px;height:150px;display:flex;align-items:center;gap:40px" data-anim="left"><b style="font:800 34px var(--sans);width:900px">Chạy thử, so với báo cáo làm tay</b><span class="p" style="width:400px">Chỉ huy trưởng</span><span class="p">Tuần sau</span></div>
+    </div>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- ====== SỰ KIỆN ====== -->
+  <!-- CẢNH: Toàn cảnh lia · sự kiện (hai slide liền, đổi data-cam, các lớp data-parallax tự trượt) -->
+  <section class="slide" data-scene="su-kien" data-cam="0">
+    <p class="tag" style="color:#8b97b0" data-anim="fade">Sự kiện · toàn cảnh lia (1/2)</p>
+    <h2 class="abs" style="left:120px;top:300px;font:900 120px/1 var(--sans);letter-spacing:-.03em" data-anim="blur">Bình minh<br>ở công trường</h2>
+  </section>
+  <section class="slide" data-scene="su-kien" data-cam="900">
+    <p class="tag" style="color:#8b97b0" data-anim="fade">Sự kiện · toàn cảnh lia (2/2): nền vừa trượt, xa chậm gần nhanh</p>
+    <h2 class="abs" style="left:120px;top:300px;font:900 120px/1 var(--sans);letter-spacing:-.03em" data-anim="blur">Máy quay<br>đi tiếp</h2>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- CẢNH: Cửa sổ chat · sự kiện hoặc giảng dạy -->
+  <section class="slide" data-scene="su-kien" data-cam="1400">
+    <p class="tag" style="color:#8b97b0" data-anim="fade">Cửa sổ chat</p>
+    <div class="win" style="left:520px;top:200px;width:880px;height:600px" data-anim="zoom">
+      <div class="tb"><i></i><i></i><i></i>Zalo · Chỉ huy trưởng</div>
+      <div style="padding:30px">
+        <p class="bub me" data-anim="rise" data-delay="500">Lập báo cáo tiến độ tuần block B.</p>
+        <p class="bub bot" data-anim="rise" data-delay="1100">Đã nhận. Em đọc nhật ký, so tiến độ, gửi anh bản nháp trước 15h.</p>
+      </div>
+    </div>
+  </section>
+  <!-- /CẢNH -->
+
+  <!-- CẢNH: Terminal agent đang chạy · sự kiện hoặc giảng dạy -->
+  <section class="slide" data-scene="su-kien" data-cam="1800">
+    <p class="tag" style="color:#8b97b0" data-anim="fade">Terminal agent đang chạy</p>
+    <div class="win" style="left:320px;top:200px;width:1280px;height:600px" data-anim="zoom">
+      <div class="tb"><i></i><i></i><i></i>agent · báo cáo tuần block B</div>
+      <div class="log" data-stagger="450" data-delay="500">
+        <p data-anim="fade"><span class="ok">✓</span> Đọc nhật ký cả tuần</p>
+        <p data-anim="fade"><span class="ok">✓</span> So với tiến độ kế hoạch</p>
+        <p data-anim="fade"><span class="ok">✓</span> Tìm hạng mục chậm và lý do</p>
+        <p data-anim="fade"><span class="go">→</span> Gửi chỉ huy trưởng, <span class="go">chờ duyệt</span><span data-loop="blink" style="color:#fb923c">▍</span></p>
+      </div>
+    </div>
+  </section>
+  <!-- /CẢNH -->
+
+</div>
+<script>
+/* sinh dãy phố cho cảnh "Toàn cảnh lia" */
+(() => {
+  let s = 7; const r = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const fill = (id, base, var1) => { const g = document.getElementById(id); let x = 0, h = '';
+    while (x < 3840) { const w = 80 + r() * 180, ht = base + r() * var1; h += `<rect x="${x}" y="${1080 - ht}" width="${w}" height="${ht}"/>`; x += w + 20 + r() * 60; }
+    g.innerHTML = h; };
+  fill('farCity', 260, 300); fill('nearCity', 120, 220);
+})();
+</script>
+<script src="../runtime/deck.js"></script>
+<script>
+/* câu hỏi kiểm tra: khi đáp án hiện thì tô xanh phương án đúng */
+(() => {
+  const stage = document.querySelector('.sm-stage');
+  const check = () => document.querySelectorAll('[data-quiz]').forEach(q => q.classList.toggle('q-ok', !!q.querySelector('[data-step].sm-shown')));
+  stage.addEventListener('sm:change', check); addEventListener('click', () => setTimeout(check)); addEventListener('keydown', () => setTimeout(check));
+})();
+</script>
+</body>
+</html>
