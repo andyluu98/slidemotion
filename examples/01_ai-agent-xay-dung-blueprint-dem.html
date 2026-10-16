@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Agent cho ngành xây dựng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#08101e; --ink2:#0e1b33; --line:rgba(120,170,255,.13); --line2:rgba(120,170,255,.28);
+  --paper:#eef1f6; --mut:#9fb0cc; --y:#ffc21a; --o:#ff6b2c; --c:#5fd4ff; --r:#ff4d5e; --g:#3ddc97;
+  --ease:cubic-bezier(.2,.8,.2,1); --morph:cubic-bezier(.75,0,.2,1);
+  --sans:'Be Vietnam Pro',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#03070f;overflow:hidden;color:var(--paper);font-family:var(--sans)}
+#stage{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;
+  background:radial-gradient(1200px 700px at 70% 30%,#13284a 0%,var(--ink) 60%,#050a14 100%)}
+/* ---------- persistent layers (morph objects) ---------- */
+#grid{position:absolute;inset:-200px;transition:transform 1.4s var(--morph);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px),
+  linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:40px 40px,40px 40px,200px 200px,200px 200px}
+#ring{position:absolute;left:0;top:0;border-radius:50%;border:1.5px dashed rgba(95,212,255,.55);pointer-events:none;
+  transition:all 1.3s var(--morph);animation:spin 60s linear infinite}
+#beam{position:absolute;left:0;top:0;background:var(--y);box-shadow:0 0 40px rgba(255,194,26,.45);transform-origin:0 0;
+  transition:all 1.15s var(--morph);z-index:3;pointer-events:none}
+#beam::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent 0 14px,rgba(8,16,30,.85) 14px 28px);opacity:var(--stripe,0);transition:opacity .8s}
+#wipe{position:absolute;top:0;bottom:0;width:3px;left:-20px;background:var(--y);box-shadow:0 0 30px 6px rgba(255,194,26,.6);z-index:9;opacity:0;pointer-events:none}
+#wipe.go{animation:wipe .9s var(--morph)}
+@keyframes wipe{0%{left:-20px;opacity:1}100%{left:1620px;opacity:.2}}
+@keyframes spin{to{rotate:360deg}}
+/* header + ruler */
+#hdr{position:absolute;left:0;right:0;top:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 100px;
+  font:700 14px/1 var(--mono);letter-spacing:.16em;color:var(--mut);z-index:5;border-bottom:1px solid var(--line)}
+#hdr b{color:var(--y)} #sheet{display:flex;gap:28px}
+#ruler{position:absolute;left:100px;right:100px;bottom:28px;height:22px;z-index:5;
+  background:repeating-linear-gradient(90deg,rgba(159,176,204,.5) 0 1px,transparent 1px 10px) bottom/100% 7px no-repeat,
+  repeating-linear-gradient(90deg,rgba(159,176,204,.8) 0 1px,transparent 1px 50px) bottom/100% 14px no-repeat}
+#ruler i{position:absolute;left:0;bottom:0;height:3px;background:var(--y);transition:width 1.1s var(--morph);box-shadow:0 0 12px var(--y)}
+#hint{position:absolute;right:100px;bottom:56px;font:400 12px var(--mono);color:rgba(159,176,204,.55);letter-spacing:.1em;z-index:5}
+/* ---------- slides + reveal system ---------- */
+.slide{position:absolute;inset:0;visibility:hidden;transition:visibility 0s .5s;z-index:4}
+.slide.on{visibility:visible;transition-delay:0s}
+.r{opacity:0;transform:translate3d(var(--fx,0),var(--fy,34px),0) scale(var(--fs,1)) rotate(var(--fr,0deg));filter:blur(8px);
+  transition:opacity .35s,transform .35s,filter .35s}
+.on .r{opacity:1;transform:none;filter:blur(0);transition:opacity .8s var(--ease),transform 1s var(--ease),filter .8s var(--ease);transition-delay:calc(var(--d,0)*1ms + 300ms)}
+.slide svg .r{transform-box:fill-box;transform-origin:center}
+.r.l{--fx:-70px;--fy:0} .r.rt{--fx:70px;--fy:0} .r.s{--fs:.82;--fy:0} .r.dn{--fy:-160px;--fr:-4deg}
+.on .r.dn{transition:opacity .5s,transform 1.1s cubic-bezier(.3,1.5,.5,1),filter .5s;transition-delay:calc(var(--d,0)*1ms + 300ms)}
+[pathLength]{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .3s}
+.on [pathLength]{stroke-dashoffset:0;transition:stroke-dashoffset 1.5s var(--ease) calc(var(--d,0)*1ms + 300ms)}
+.grow{transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.on .grow{transform:scaleX(1);transition:transform 1.2s var(--ease) calc(var(--d,0)*1ms + 300ms)}
+/* ---------- type ---------- */
+.abs{position:absolute}
+.kick{font:700 16px/1 var(--mono);letter-spacing:.2em;color:var(--y);text-transform:uppercase}
+.h1{font:900 168px/.9 var(--sans);letter-spacing:-.045em}
+.h2{font:800 60px/1.06 var(--sans);letter-spacing:-.025em}
+.h2 em,.h1 em{font-style:normal;color:var(--y)}
+.p{font:400 23px/1.55 var(--sans);color:var(--mut)}
+.mono{font-family:var(--mono)}
+.tag{display:inline-block;font:700 12px/1 var(--mono);letter-spacing:.14em;padding:7px 10px;border:1px solid currentColor;border-radius:3px}
+.panel{position:absolute;background:linear-gradient(160deg,rgba(20,38,70,.85),rgba(10,20,40,.9));border:1px solid var(--line2);border-radius:6px;overflow:hidden}
+.panel::before,.panel::after{content:"";position:absolute;width:18px;height:18px;border:2px solid var(--y);z-index:2}
+.panel::before{left:-1px;top:-1px;border-right:0;border-bottom:0}.panel::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.demo{position:absolute;right:16px;top:14px;font:400 11px var(--mono);letter-spacing:.14em;color:rgba(159,176,204,.6)}
+.hz{background:repeating-linear-gradient(-45deg,var(--y) 0 12px,#111 12px 24px)}
+.ck{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--g);color:#05210f;font:900 15px var(--sans);flex:none}
+.pulse{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35;transform:scale(.85)}}
+@keyframes float{50%{transform:translateY(-14px) rotate(var(--rot))}}
+@keyframes blink{50%{opacity:0}}
+@keyframes scan{0%{top:0}100%{top:100%}}
+@keyframes rise{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(-560px);opacity:0}}
+@keyframes wave{50%{transform:scaleY(.25)}}
+@keyframes type{from{width:0}}
+@keyframes caret{50%{border-color:transparent}}
+@keyframes lit{to{fill:var(--y);opacity:1}}
+.on #wins rect{animation:lit .5s var(--wd) forwards}
+.typing{width:0}.on .typing{animation:type 2.2s steps(25) .8s both,caret .8s step-end infinite;width:25ch}
+
+/* S2 docs */
+.doc{width:230px;padding:16px 18px;background:#f4f1ea;color:#1b2333;border-radius:4px;box-shadow:0 20px 40px rgba(0,0,0,.45);
+  transform:rotate(var(--rot));animation:float var(--t,6s) ease-in-out infinite}
+.doc b{display:block;font:800 17px/1.3 var(--sans);margin-top:10px}
+.doc span{font:700 11px var(--mono);letter-spacing:.12em;padding:4px 7px;border-radius:2px;color:#fff;background:var(--bg,#334)}
+.doc i{display:block;height:6px;background:#d9d4c8;border-radius:3px;margin-top:8px}
+.pain{display:flex;gap:18px;align-items:flex-start;font:400 22px/1.45 var(--sans);color:#cdd7ea;padding:18px 0;border-top:1px solid var(--line2)}
+.pain .mono{color:var(--o);font-size:14px;font-weight:700;padding-top:6px;min-width:46px}
+/* S3 */
+.bub{max-width:470px;padding:16px 20px;border-radius:16px;font:400 20px/1.45 var(--sans);margin-bottom:16px}
+.step{display:flex;align-items:center;gap:16px;padding:14px 18px;border:1px solid var(--line2);border-radius:8px;margin-bottom:12px;font:600 21px var(--sans);background:rgba(255,255,255,.03)}
+.step .mono{margin-left:auto;font-size:12px;color:var(--mut);letter-spacing:.1em}
+/* use case template */
+.uc-num{position:absolute;left:330px;top:70px;font:900 300px/1 var(--sans);color:transparent;-webkit-text-stroke:2px rgba(255,194,26,.16);letter-spacing:-.06em}
+.flow{position:absolute;left:100px;top:360px;width:600px}
+.flow .row{display:grid;grid-template-columns:150px 1fr;gap:18px;padding:16px 0;border-top:1px solid var(--line2);font:400 21px/1.45 var(--sans);color:#d5deee}
+.flow .row .mono{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--c);padding-top:6px}
+.keep{position:absolute;left:100px;top:700px;width:600px;display:flex;align-items:center;gap:0;background:rgba(255,194,26,.08);border:1px solid rgba(255,194,26,.4);border-radius:6px;overflow:hidden}
+.keep .hz{width:14px;align-self:stretch}
+.keep div:last-child{padding:16px 20px;font:400 20px/1.4 var(--sans)}
+.keep b{font:700 12px var(--mono);letter-spacing:.16em;color:var(--y);display:block;margin-bottom:4px}
+/* tables in mocks */
+.tb{width:100%;border-collapse:collapse;font:400 17px var(--sans)}
+.tb th{font:700 11px var(--mono);letter-spacing:.14em;color:var(--mut);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line2)}
+.tb td{padding:12px;border-bottom:1px solid var(--line)}
+.bar{height:10px;border-radius:5px;background:linear-gradient(90deg,var(--c),#2b7fff)}
+.src{font:700 13px var(--mono);color:#111;background:var(--y);padding:4px 8px;border-radius:3px}
+/* S11/12 */
+.node-l{position:absolute;width:170px;margin-left:-85px;text-align:center;font:700 17px/1.3 var(--sans)}
+.node-l small{display:block;font:400 13px/1.35 var(--sans);color:var(--mut);margin-top:4px}
+.floor{position:absolute;left:720px;width:760px;height:112px;border:1px solid var(--line2);border-bottom:6px solid #5d6f92;background:linear-gradient(90deg,rgba(20,40,75,.9),rgba(14,28,52,.9));display:flex;align-items:center;padding:0 26px;gap:22px}
+.floor .lv{font:700 12px var(--mono);letter-spacing:.14em;color:var(--c);width:70px}
+.floor h4{font:800 23px var(--sans);width:220px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;width:330px}
+.chips span{font:400 13px var(--mono);padding:6px 9px;border:1px solid var(--line2);border-radius:3px;color:#c8d3e8}
+.particle{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--y);box-shadow:0 0 12px var(--y);animation:rise 3.2s linear infinite}
+/* S13 */
+.risk{position:absolute;top:330px;width:325px;height:420px;background:linear-gradient(170deg,#16294b,#0b1630);border:1px solid var(--line2);border-radius:6px;overflow:hidden;padding:0 26px}
+.risk .hz{height:26px;margin:0 -26px 30px}
+.risk .mono{font-size:14px;font-weight:700;color:var(--r);letter-spacing:.16em}
+.risk h3{font:800 32px/1.15 var(--sans);margin:14px 0 18px}
+.risk p{font:400 20px/1.5 var(--sans);color:#c8d3e8}
+.risk p b{color:var(--y);font-weight:600}
+/* S14 */
+.gl{position:absolute;font:700 12px var(--mono);color:var(--mut);letter-spacing:.1em}
+.gbar{position:absolute;height:64px;border-radius:6px;display:flex;align-items:center;padding:0 20px;font:800 20px var(--sans);color:#0b1220}
+.gtask{position:absolute;font:400 18px/1.45 var(--sans);color:#c8d3e8;width:420px}
+.kpi{display:inline-flex;align-items:center;gap:12px;padding:14px 20px;border:1px solid var(--line2);border-radius:40px;font:600 19px var(--sans);margin-right:14px;background:rgba(255,255,255,.03)}
+.kpi i{width:10px;height:10px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="grid"></div>
+  <div id="ring"></div>
+  <div id="beam"></div>
+  <div id="wipe"></div>
+  <div id="hdr"><span><b>AI AGENT</b> × XÂY DỰNG</span><span id="sheet"><span id="sname">BÌA</span><span id="snum">BV-01 / 15</span></span></div>
+  <div id="ruler"><i></i></div>
+  <div id="hint">← → CHUYỂN SLIDE · F TOÀN MÀN HÌNH</div>
+
+<!-- 01 COVER -->
+<section class="slide" data-name="BÌA" data-beam="100 598 340 12 0" data-ring="930 100 760 .5" data-grid="0 0">
+  <div class="abs kick r" style="left:100px;top:200px">Hồ sơ khái niệm · Bản vẽ số 01</div>
+  <div class="abs h1 r" style="left:92px;top:250px;--d:120">AI Agent</div>
+  <div class="abs h2 r" style="left:100px;top:420px;font-size:62px;font-weight:300;--d:240">cho ngành <em style="font-weight:800">xây dựng</em></div>
+  <div class="abs p r" style="left:100px;top:640px;width:560px;--d:420">Từ trợ lý biết trả lời sang <b style="color:var(--paper)">đồng nghiệp biết làm việc</b> trên công trường.</div>
+  <svg class="abs" style="left:880px;top:90px" width="660" height="760" viewBox="0 0 660 760" fill="none">
+    <g stroke="#5f7fb5" stroke-width="2">
+      <line x1="40" y1="720" x2="620" y2="720" pathLength="1" style="--d:0"/>
+      <g stroke="#9fb7e0" stroke-width="3">
+        <line x1="120" y1="720" x2="120" y2="270" pathLength="1" style="--d:200"/>
+        <line x1="240" y1="720" x2="240" y2="270" pathLength="1" style="--d:300"/>
+        <line x1="360" y1="720" x2="360" y2="270" pathLength="1" style="--d:400"/>
+        <line x1="480" y1="720" x2="480" y2="270" pathLength="1" style="--d:500"/>
+      </g>
+      <g stroke="#cfdcf4" stroke-width="5">
+        <line x1="110" y1="630" x2="490" y2="630" pathLength="1" style="--d:700"/>
+        <line x1="110" y1="540" x2="490" y2="540" pathLength="1" style="--d:850"/>
+        <line x1="110" y1="450" x2="490" y2="450" pathLength="1" style="--d:1000"/>
+        <line x1="110" y1="360" x2="490" y2="360" pathLength="1" style="--d:1150"/>
+        <line x1="110" y1="270" x2="490" y2="270" pathLength="1" style="--d:1300"/>
+      </g>
+      <g stroke="rgba(159,183,224,.35)" stroke-dasharray="6 8"><line x1="120" y1="630" x2="240" y2="540"/><line x1="360" y1="540" x2="480" y2="450"/><line x1="240" y1="450" x2="360" y2="360"/></g>
+      <!-- tower crane -->
+      <g stroke="var(--y)" stroke-width="3">
+        <line x1="575" y1="720" x2="575" y2="70" pathLength="1" style="--d:600"/>
+        <line x1="560" y1="720" x2="560" y2="70" pathLength="1" style="--d:650"/>
+        <polyline points="560,700 575,670 560,640 575,610 560,580 575,550 560,520 575,490 560,460 575,430 560,400 575,370 560,340 575,310 560,280 575,250 560,220 575,190 560,160 575,130 560,100 575,70" stroke-width="1.5" pathLength="1" style="--d:800"/>
+        <line x1="150" y1="70" x2="640" y2="70" pathLength="1" style="--d:1200"/>
+        <polyline points="150,70 568,30 640,70" stroke-width="2" pathLength="1" style="--d:1400"/>
+      </g>
+    </g>
+    <g style="transform-origin:300px 70px;animation:sway 5s ease-in-out infinite">
+      <line x1="300" y1="70" x2="300" y2="215" stroke="#cfdcf4" stroke-width="1.5"/>
+      <rect x="230" y="215" width="140" height="16" fill="var(--y)"/>
+    </g>
+    <circle r="9" fill="var(--c)"><animateMotion dur="7s" repeatCount="indefinite" path="M120 720 L480 720 L480 630 L120 630 L120 540 L480 540 L480 450 L120 450 L120 360 L480 360 L480 270 L120 270"/></circle>
+    <circle r="22" fill="none" stroke="var(--c)" opacity=".5"><animateMotion dur="7s" repeatCount="indefinite" path="M120 720 L480 720 L480 630 L120 630 L120 540 L480 540 L480 450 L120 450 L120 360 L480 360 L480 270 L120 270"/><animate attributeName="r" values="12;26;12" dur="1.6s" repeatCount="indefinite"/></circle>
+  </svg>
+  <style>@keyframes sway{50%{transform:rotate(2.5deg)}}</style>
+</section>
+
+<!-- 02 PROBLEM -->
+<section class="slide" data-name="VẤN ĐỀ" data-beam="100 300 10 120 0" data-ring="1020 120 640 .25" data-grid="-40 -20">
+  <div class="abs kick r" style="left:130px;top:130px">02 · Vấn đề</div>
+  <div class="abs h2 r" style="left:130px;top:170px;width:620px;--d:100">Công trường không thiếu dữ liệu.<br><em>Thiếu người gom dữ liệu.</em></div>
+  <div class="abs" style="left:100px;top:470px;width:610px">
+    <div class="pain r" style="--d:400"><span class="mono">01</span>Kỹ sư dành nhiều giờ cho nhật ký, biên bản, báo cáo thay vì kiểm tra thi công.</div>
+    <div class="pain r" style="--d:550"><span class="mono">02</span>Ảnh trong Zalo, khối lượng trong Excel, thay đổi thiết kế trong email.</div>
+    <div class="pain r" style="--d:700"><span class="mono">03</span>Sai sót phát hiện muộn, nghiệm thu tranh cãi, thanh toán chậm.</div>
+  </div>
+  <svg class="abs" style="left:780px;top:120px" width="740" height="700" fill="none"><path d="M120 90 C 400 20, 300 300, 560 160 S 300 520, 150 420 S 520 620, 640 520" stroke="var(--o)" stroke-width="2" stroke-dasharray="1" pathLength="1" style="--d:500;opacity:.6"/></svg>
+  <div class="abs r s" style="left:820px;top:150px;--d:200"><div class="doc" style="--rot:-7deg;--t:5s"><span style="--bg:#0068ff">ZALO</span><b>Nhóm công trường Block B</b><i></i><i style="width:70%"></i></div></div>
+  <div class="abs r s" style="left:1170px;top:120px;--d:320"><div class="doc" style="--rot:5deg;--t:6.5s"><span style="--bg:#1d7a46">XLSX</span><b>khoi-luong_final_v3_sua.xlsx</b><i></i><i style="width:55%"></i></div></div>
+  <div class="abs r s" style="left:1260px;top:390px;--d:440"><div class="doc" style="--rot:-4deg;--t:7s"><span style="--bg:#b03a2e">EMAIL</span><b>Thay đổi thiết kế rev C</b><i></i><i style="width:80%"></i></div></div>
+  <div class="abs r s" style="left:930px;top:360px;--d:560"><div class="doc" style="--rot:8deg;--t:5.5s"><span style="--bg:#555">GIẤY</span><b>Nhật ký thi công viết tay</b><i></i><i style="width:60%"></i></div></div>
+  <div class="abs r s" style="left:820px;top:590px;--d:680"><div class="doc" style="--rot:-3deg;--t:6.2s"><span style="--bg:#7a3fb0">PDF</span><b>Biên bản nghiệm thu chờ ký</b><i></i><i style="width:45%"></i></div></div>
+  <div class="abs r s" style="left:1160px;top:630px;--d:800"><div class="doc" style="--rot:6deg;--t:5.8s"><span style="--bg:var(--o)">CUỘC GỌI</span><b>"Anh ơi đổi thép chưa?"</b><i></i></div></div>
+</section>
+
+<!-- 03 CHATBOT vs AGENT -->
+<section class="slide" data-name="KHÁI NIỆM" data-beam="740 250 6 420 0" data-ring="700 420 90 .7" data-grid="-80 0">
+  <div class="abs kick r" style="left:100px;top:110px">03 · Khái niệm</div>
+  <div class="abs h2 r" style="left:100px;top:145px;--d:100">Chatbot trả lời. <em>Agent làm việc.</em></div>
+  <div class="panel r l" style="left:100px;top:250px;width:600px;height:500px;padding:34px;--d:250;background:rgba(40,48,64,.5)">
+    <div class="tag" style="color:var(--mut)">CHATBOT</div>
+    <div style="margin-top:30px">
+      <div class="bub" style="background:#2a3550;margin-left:auto;width:fit-content">Nhật ký thi công gồm những mục gì?</div>
+      <div class="bub" style="background:#1a2234;color:#b8c3d8">Thường gồm thời tiết, nhân lực, thiết bị, khối lượng thực hiện, sự cố và chỉ đạo của các bên...</div>
+    </div>
+    <div class="mono" style="position:absolute;left:34px;bottom:34px;font-size:15px;color:var(--mut);letter-spacing:.08em">Hết lượt. Việc vẫn nằm đó, anh tự làm.</div>
+  </div>
+  <div class="panel r rt" style="left:780px;top:250px;width:720px;height:500px;padding:34px;--d:400;border-color:rgba(255,194,26,.55)">
+    <div class="tag" style="color:var(--y)">AI AGENT</div>
+    <div style="font:800 24px var(--sans);margin:22px 0 20px">"Lập nhật ký hôm nay cho block B."</div>
+    <div class="step r" style="--d:900"><span class="ck">✓</span>Đọc tin nhắn, ảnh trong nhóm Zalo<span class="mono">ZALO</span></div>
+    <div class="step r" style="--d:1250"><span class="ck">✓</span>Mở file tiến độ, so với kế hoạch<span class="mono">EXCEL</span></div>
+    <div class="step r" style="--d:1600"><span class="ck">✓</span>Viết nhật ký đúng mẫu công ty<span class="mono">WORD</span></div>
+    <div class="step r" style="--d:1950;border-color:var(--y)"><span class="ck pulse" style="background:var(--y)">•</span>Gửi chỉ huy trưởng duyệt<span class="mono" style="color:var(--y)">ĐANG CHỜ</span></div>
+  </div>
+  <div class="abs p r" style="left:100px;top:780px;--d:2300">Chatbot như người tra cứu ở thư viện. Agent như <b style="color:var(--paper)">kỹ sư phụ việc được giao đầu việc</b> và tự đi làm.</div>
+</section>
+
+<!-- 04 LOOP -->
+<section class="slide" data-name="VÒNG LẶP" data-beam="100 470 220 8 0" data-ring="760 190 620 .45" data-grid="-120 -40">
+  <div class="abs kick r" style="left:100px;top:170px">04 · Cách agent làm việc</div>
+  <div class="abs h2 r" style="left:100px;top:210px;width:480px;--d:100">Một vòng lặp, <em>chạy tới khi xong</em></div>
+  <div class="abs p r" style="left:100px;top:500px;width:470px;--d:300">Sai ở bước nào thì quay lại bước đó, giống kỹ sư làm lại phần tính sai trước khi trình ký.</div>
+  <svg class="abs" style="left:640px;top:110px" width="860" height="780" fill="none">
+    <circle cx="430" cy="390" r="250" stroke="#3a5a90" stroke-width="2" pathLength="1" style="--d:0"/>
+    <circle cx="430" cy="390" r="250" stroke="var(--y)" stroke-width="3" stroke-dasharray="40 1531" opacity=".9"><animateTransform attributeName="transform" type="rotate" from="0 430 390" to="360 430 390" dur="8s" repeatCount="indefinite"/></circle>
+    <circle r="10" fill="var(--y)"><animateMotion dur="8s" repeatCount="indefinite" path="M430 140 A250 250 0 1 1 429.9 140"/></circle>
+    <circle cx="430" cy="390" r="96" fill="#0e1f3d" stroke="var(--c)" stroke-width="2"/>
+    <circle cx="430" cy="390" r="120" stroke="var(--c)" stroke-dasharray="4 10" opacity=".6" style="transform-origin:430px 390px;animation:spin 20s linear infinite"/>
+    <text x="430" y="384" text-anchor="middle" fill="var(--c)" font-family="JetBrains Mono" font-weight="700" font-size="22" letter-spacing="3">AGENT</text>
+    <text x="430" y="412" text-anchor="middle" fill="#9fb0cc" font-family="Be Vietnam Pro" font-size="15">bộ nhớ dự án</text>
+    <g font-family="JetBrains Mono" font-weight="700" font-size="22" text-anchor="middle">
+      <g class="r s" style="--d:300"><circle cx="430" cy="140" r="40" fill="var(--ink)" stroke="var(--y)" stroke-width="3"/><text x="430" y="148" fill="var(--y)">1</text></g>
+      <g class="r s" style="--d:500"><circle cx="668" cy="313" r="40" fill="var(--ink)" stroke="var(--y)" stroke-width="3"/><text x="668" y="321" fill="var(--y)">2</text></g>
+      <g class="r s" style="--d:700"><circle cx="577" cy="592" r="40" fill="var(--ink)" stroke="var(--y)" stroke-width="3"/><text x="577" y="600" fill="var(--y)">3</text></g>
+      <g class="r s" style="--d:900"><circle cx="283" cy="592" r="40" fill="var(--ink)" stroke="var(--y)" stroke-width="3"/><text x="283" y="600" fill="var(--y)">4</text></g>
+      <g class="r s" style="--d:1100"><circle cx="192" cy="313" r="40" fill="var(--ink)" stroke="var(--y)" stroke-width="3"/><text x="192" y="321" fill="var(--y)">5</text></g>
+    </g>
+  </svg>
+  <div class="node-l r" style="left:1210px;top:220px;text-align:left;margin-left:0;width:240px;--d:350">Nhận việc<small>"Lập nhật ký hôm nay cho block B"</small></div>
+  <div class="node-l r" style="left:1360px;top:445px;text-align:left;margin-left:0;width:150px;--d:550">Lập kế hoạch<small>Cần ảnh, tin nhắn, tiến độ</small></div>
+  <div class="node-l r" style="left:1265px;top:735px;text-align:left;margin-left:0;width:240px;--d:750">Dùng công cụ<small>Zalo, Excel, đọc ảnh</small></div>
+  <div class="node-l r" style="left:700px;top:735px;text-align:right;margin-left:0;width:200px;--d:950">Tự kiểm tra<small>Khớp khối lượng, đánh dấu chỗ lệch</small></div>
+  <div class="node-l r" style="left:600px;top:340px;text-align:right;margin-left:0;width:170px;--d:1150">Báo cáo, chờ duyệt<small>Nháp gửi chỉ huy trưởng</small></div>
+</section>
+
+<!-- 05 LIFECYCLE -->
+<section class="slide" data-name="VÒNG ĐỜI DỰ ÁN" data-beam="100 596 1400 30 0" data-ring="1250 60 300 .3" data-grid="-160 -80" data-stripe="1">
+  <div class="abs kick r" style="left:100px;top:110px">05 · Bản đồ ứng dụng</div>
+  <div class="abs h2 r" style="left:100px;top:145px;--d:100">Agent có việc ở <em>mọi giai đoạn</em> dự án</div>
+  <svg class="abs" style="left:0;top:220px" width="1600" height="380" fill="none" stroke="#9fb7e0" stroke-width="1.5" opacity=".7">
+    <line x1="275" y1="0" x2="275" y2="70" pathLength="1" style="--d:300"/><line x1="625" y1="0" x2="625" y2="70" pathLength="1" style="--d:450"/>
+    <line x1="975" y1="0" x2="975" y2="70" pathLength="1" style="--d:600"/><line x1="1325" y1="0" x2="1325" y2="70" pathLength="1" style="--d:750"/>
+  </svg>
+  <div class="panel r dn" style="left:120px;top:290px;width:310px;height:280px;padding:26px;--d:300"><div class="kick" style="font-size:12px;color:var(--c)">Giai đoạn 1</div><div style="font:800 30px var(--sans);margin:10px 0 14px">Đấu thầu</div><div class="p" style="font-size:18px">Đọc hồ sơ mời thầu, bóc khối lượng, lập dự toán sơ bộ.</div></div>
+  <div class="panel r dn" style="left:470px;top:290px;width:310px;height:280px;padding:26px;--d:450"><div class="kick" style="font-size:12px;color:var(--c)">Giai đoạn 2</div><div style="font:800 30px var(--sans);margin:10px 0 14px">Thiết kế</div><div class="p" style="font-size:18px">Soát xung đột bản vẽ, đối chiếu tiêu chuẩn, quản lý phiên bản.</div></div>
+  <div class="panel r dn" style="left:820px;top:290px;width:310px;height:280px;padding:26px;--d:600;border-color:rgba(255,194,26,.6)"><div class="kick" style="font-size:12px">Giai đoạn 3 · nhiều việc nhất</div><div style="font:800 30px var(--sans);margin:10px 0 14px">Thi công</div><div class="p" style="font-size:18px">Nhật ký, tiến độ, an toàn lao động, vật tư, nghiệm thu.</div></div>
+  <div class="panel r dn" style="left:1170px;top:290px;width:310px;height:280px;padding:26px;--d:750"><div class="kick" style="font-size:12px;color:var(--c)">Giai đoạn 4</div><div style="font:800 30px var(--sans);margin:10px 0 14px">Bàn giao, vận hành</div><div class="p" style="font-size:18px">Hồ sơ hoàn công, sổ tay bảo trì, tiếp nhận bảo hành.</div></div>
+  <div class="abs r" style="left:100px;top:680px;width:1400px;display:flex;justify-content:space-between;--d:900">
+    <span class="mono" style="color:var(--mut);font-size:14px;letter-spacing:.14em">KHỞI ĐỘNG DỰ ÁN</span><span class="mono" style="color:var(--mut);font-size:14px;letter-spacing:.14em">BÀN GIAO →</span></div>
+  <div class="abs p r" style="left:100px;top:740px;width:1100px;--d:1050">Chỗ nào việc <b style="color:var(--paper)">lặp lại và nhiều giấy tờ</b>, chỗ đó agent vào trước.</div>
+</section>
+
+<!-- 06 UC1 ESTIMATE -->
+<section class="slide" data-name="USE CASE 01" data-beam="100 340 600 4 0" data-ring="1080 160 200 .3" data-grid="-200 -40">
+  <div class="uc-num r" style="--d:0">01</div>
+  <div class="abs kick r" style="left:100px;top:140px">Use case 01 · Đấu thầu</div>
+  <div class="abs h2 r" style="left:100px;top:180px;width:620px;font-size:52px;--d:100">Agent bóc khối lượng và <em>dự toán</em></div>
+  <div class="flow">
+    <div class="row r" style="--d:300"><span class="mono">ĐẦU VÀO</span>Bản vẽ PDF hoặc DWG, bảng đơn giá công ty.</div>
+    <div class="row r" style="--d:420"><span class="mono">AGENT LÀM</span>Đọc bảng thống kê trên bản vẽ, tính khối lượng, áp đơn giá.</div>
+    <div class="row r" style="--d:540"><span class="mono">ĐẦU RA</span>Bảng Excel, mỗi dòng ghi nguồn: tờ nào, ô nào.</div>
+  </div>
+  <div class="keep r" style="--d:700"><div class="hz"></div><div><b>CON NGƯỜI GIỮ</b>Duyệt đơn giá, quyết định giá chào thầu.</div></div>
+  <div class="panel r rt" style="left:780px;top:130px;width:720px;height:690px;--d:200">
+    <span class="demo">MINH HỌA</span>
+    <svg width="720" height="300" fill="none" stroke="#9fb7e0" stroke-width="2">
+      <rect x="80" y="50" width="560" height="210" pathLength="1" style="--d:400"/>
+      <line x1="300" y1="50" x2="300" y2="260" pathLength="1" style="--d:600"/><line x1="80" y1="160" x2="300" y2="160" pathLength="1" style="--d:700"/>
+      <line x1="480" y1="50" x2="480" y2="180" pathLength="1" style="--d:800"/><line x1="480" y1="180" x2="640" y2="180" pathLength="1" style="--d:850"/>
+      <g stroke="var(--c)" stroke-width="1"><line x1="80" y1="30" x2="640" y2="30" pathLength="1" style="--d:900"/><line x1="60" y1="50" x2="60" y2="260" pathLength="1" style="--d:950"/></g>
+      <g fill="var(--ink)" stroke="var(--c)"><circle cx="80" cy="282" r="13"/><circle cx="300" cy="282" r="13"/><circle cx="640" cy="282" r="13"/></g>
+      <g fill="var(--c)" stroke="none" font-family="JetBrains Mono" font-size="13" text-anchor="middle"><text x="80" y="287">1</text><text x="300" y="287">2</text><text x="640" y="287">3</text><text x="190" y="110" fill="#9fb0cc">P.KHÁCH</text><text x="390" y="160" fill="#9fb0cc">P.BẾP</text><text x="560" y="120" fill="#9fb0cc">WC</text></g>
+      <rect x="0" y="0" width="720" height="4" fill="var(--y)" stroke="none" opacity=".8"><animate attributeName="y" values="40;270;40" dur="3s" repeatCount="indefinite"/></rect>
+    </svg>
+    <div style="padding:6px 34px 0">
+      <table class="tb">
+        <tr><th>HẠNG MỤC</th><th>ĐVT</th><th style="width:200px">KHỐI LƯỢNG</th><th>NGUỒN</th></tr>
+        <tr class="r" style="--d:1100"><td>Bê tông móng</td><td>m³</td><td><div class="bar grow" style="width:70%;--d:1200"></div></td><td><span class="src">KC-02</span></td></tr>
+        <tr class="r" style="--d:1300"><td>Cốt thép dầm</td><td>kg</td><td><div class="bar grow" style="width:92%;--d:1400"></div></td><td><span class="src">KC-05</span></td></tr>
+        <tr class="r" style="--d:1500"><td>Xây tường 110</td><td>m²</td><td><div class="bar grow" style="width:55%;--d:1600"></div></td><td><span class="src">KT-04</span></td></tr>
+        <tr class="r" style="--d:1700"><td>Trát tường</td><td>m²</td><td><div class="bar grow" style="width:80%;--d:1800"></div></td><td><span class="src">KT-04</span></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 07 UC2 DIARY -->
+<section class="slide" data-name="USE CASE 02" data-beam="100 340 600 4 0" data-ring="1090 380 130 .5" data-grid="-240 -80">
+  <div class="uc-num r">02</div>
+  <div class="abs kick r" style="left:100px;top:140px">Use case 02 · Thi công</div>
+  <div class="abs h2 r" style="left:100px;top:180px;width:620px;font-size:52px;--d:100">Agent viết <em>nhật ký công trường</em></div>
+  <div class="flow">
+    <div class="row r" style="--d:300"><span class="mono">ĐẦU VÀO</span>Ảnh và tin nhắn thoại kỹ sư gửi vào nhóm Zalo như mọi ngày.</div>
+    <div class="row r" style="--d:420"><span class="mono">AGENT LÀM</span>Chép lời thành chữ, gom ảnh theo hạng mục, so với tiến độ.</div>
+    <div class="row r" style="--d:540"><span class="mono">ĐẦU RA</span>Nhật ký đúng mẫu, hạng mục chậm gắn cờ đỏ.</div>
+  </div>
+  <div class="keep r" style="--d:700"><div class="hz"></div><div><b>CON NGƯỜI GIỮ</b>Chỉ huy trưởng đọc bản tóm tắt sáng hôm sau và duyệt.</div></div>
+  <div class="panel r rt" style="left:780px;top:130px;width:720px;height:690px;--d:200">
+    <span class="demo">MINH HỌA</span>
+    <div class="abs" style="left:40px;top:70px;width:270px;height:560px;border-radius:34px;border:8px solid #22324f;background:#dfe6f0;padding:18px 14px;color:#1b2333">
+      <div class="mono" style="font-size:11px;font-weight:700;letter-spacing:.1em;color:#0068ff;margin-bottom:14px">NHÓM CT BLOCK B</div>
+      <div class="r" style="--d:500;display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#fff;padding:6px;border-radius:12px;width:200px">
+        <svg viewBox="0 0 90 70" style="background:#9fb3cc;border-radius:6px"><path d="M10 65V25h25v40M40 65V15h40v50" fill="none" stroke="#fff" stroke-width="3"/></svg>
+        <svg viewBox="0 0 90 70" style="background:#b8a98f;border-radius:6px"><path d="M0 50h90M15 50V20h60v30" fill="none" stroke="#fff" stroke-width="3"/></svg>
+      </div>
+      <div class="r" style="--d:800;margin-top:12px;background:#fff;border-radius:12px;padding:12px;width:210px;display:flex;align-items:center;gap:4px;height:46px">
+        <span style="font-size:14px;color:#0068ff;margin-right:6px">▶</span>
+        <script>document.write(Array.from({length:22},(_,i)=>`<i style="display:block;width:3px;height:${8+((i*7)%19)}px;background:#0068ff;border-radius:2px;animation:wave ${0.6+(i%5)*0.15}s ease-in-out infinite"></i>`).join(''))</script>
+      </div>
+      <div class="r" style="--d:1100;margin-top:12px;background:#fff;border-radius:12px;padding:12px 14px;font:400 15px/1.4 var(--sans);width:220px">Tầng 4 xây xong trục 1 tới 3, mai làm tiếp trục 4.</div>
+      <div class="r" style="--d:1300;margin-top:12px;margin-left:40px;background:#cfe3ff;border-radius:12px;padding:12px 14px;font:400 15px/1.4 var(--sans)">Thiếu 2 thợ nề, chiều mưa nghỉ sớm.</div>
+    </div>
+    <svg class="abs" style="left:320px;top:300px" width="80" height="60" fill="none"><path d="M5 30H70M55 15l15 15-15 15" stroke="var(--y)" stroke-width="3" pathLength="1" style="--d:1500"/></svg>
+    <div class="abs r rt" style="left:410px;top:90px;width:270px;height:520px;background:#f4f1ea;color:#1b2333;border-radius:4px;padding:22px;--d:1700;box-shadow:0 20px 40px rgba(0,0,0,.4)">
+      <div class="mono" style="font-size:11px;font-weight:700;letter-spacing:.14em">NHẬT KÝ THI CÔNG</div>
+      <div style="font:800 20px var(--sans);margin:6px 0 16px">Block B · hôm nay</div>
+      <div class="mono" style="font-size:11px;color:#667;margin-top:10px">THỜI TIẾT</div><i style="display:block;height:6px;background:#d9d4c8;border-radius:3px;margin-top:6px;width:60%"></i>
+      <div class="mono" style="font-size:11px;color:#667;margin-top:14px">NHÂN LỰC</div><i style="display:block;height:6px;background:#d9d4c8;border-radius:3px;margin-top:6px;width:80%"></i>
+      <div class="mono" style="font-size:11px;color:#667;margin-top:14px">CÔNG VIỆC</div><i style="display:block;height:6px;background:#d9d4c8;border-radius:3px;margin-top:6px"></i><i style="display:block;height:6px;background:#d9d4c8;border-radius:3px;margin-top:6px;width:70%"></i>
+      <div class="r" style="--d:2200;margin-top:18px;background:#ffe3e3;border-left:4px solid var(--r);padding:10px;font:600 14px/1.4 var(--sans)">⚑ Xây tường tầng 4 chậm so với kế hoạch</div>
+      <div class="r" style="--d:2500;position:absolute;left:22px;right:22px;bottom:22px;background:#1b2333;color:var(--y);text-align:center;padding:12px;border-radius:4px;font:700 12px var(--mono);letter-spacing:.12em">CHỜ CHỈ HUY TRƯỞNG DUYỆT</div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 UC3 SAFETY -->
+<section class="slide" data-name="USE CASE 03" data-beam="100 340 600 4 0" data-ring="1200 200 420 .25" data-grid="-280 -40">
+  <div class="uc-num r">03</div>
+  <div class="abs kick r" style="left:100px;top:140px">Use case 03 · Thi công</div>
+  <div class="abs h2 r" style="left:100px;top:180px;width:620px;font-size:52px;--d:100">Agent canh <em>an toàn lao động</em></div>
+  <div class="flow">
+    <div class="row r" style="--d:300"><span class="mono">ĐẦU VÀO</span>Ảnh từ camera công trường hoặc ảnh kỹ sư chụp.</div>
+    <div class="row r" style="--d:420"><span class="mono">AGENT LÀM</span>Tìm người thiếu mũ, thiếu dây an toàn, sàn thiếu lan can.</div>
+    <div class="row r" style="--d:540"><span class="mono">ĐẦU RA</span>Cảnh báo kèm ảnh khoanh vùng, biên bản nhắc nhở, tổng hợp tuần.</div>
+  </div>
+  <div class="keep r" style="--d:700"><div class="hz"></div><div><b>CON NGƯỜI GIỮ</b>Tổ trưởng xử lý tại chỗ, quyết định mức nhắc nhở.</div></div>
+  <div class="panel r rt" style="left:780px;top:130px;width:720px;height:690px;--d:200;background:linear-gradient(180deg,#1d2c45,#0c1424)">
+    <div class="abs mono" style="left:24px;top:20px;font-size:13px;font-weight:700;letter-spacing:.12em;z-index:3">CAM 03 · TẦNG 5 <span style="color:var(--r);animation:blink 1s steps(1) infinite">● REC</span></div>
+    <svg class="abs" style="left:0;top:0" width="720" height="520" fill="none">
+      <g stroke="#6d84a8" stroke-width="4"><line x1="60" y1="470" x2="660" y2="470"/><line x1="60" y1="300" x2="660" y2="300"/><line x1="60" y1="130" x2="660" y2="130"/>
+        <line x1="90" y1="470" x2="90" y2="110"/><line x1="330" y1="470" x2="330" y2="110"/><line x1="630" y1="470" x2="630" y2="110"/></g>
+      <g stroke="#6d84a8" stroke-width="2" opacity=".6"><line x1="90" y1="470" x2="330" y2="300"/><line x1="330" y1="300" x2="630" y2="130"/></g>
+      <g stroke="#c9d4e6" stroke-width="7" stroke-linecap="round">
+        <line x1="190" y1="410" x2="190" y2="360"/><line x1="190" y1="410" x2="175" y2="465"/><line x1="190" y1="410" x2="205" y2="465"/><line x1="190" y1="375" x2="220" y2="395"/>
+        <line x1="440" y1="240" x2="440" y2="190"/><line x1="440" y1="240" x2="425" y2="295"/><line x1="440" y1="240" x2="455" y2="295"/><line x1="440" y1="205" x2="470" y2="185"/>
+        <line x1="560" y1="410" x2="560" y2="360"/><line x1="560" y1="410" x2="545" y2="465"/><line x1="560" y1="410" x2="575" y2="465"/>
+      </g>
+      <g fill="#c9d4e6"><circle cx="190" cy="342" r="14"/><circle cx="440" cy="172" r="14"/><circle cx="560" cy="342" r="14"/></g>
+      <path d="M174 338a16 16 0 0 1 32 0z" fill="var(--y)"/><path d="M544 338a16 16 0 0 1 32 0z" fill="var(--y)"/>
+    </svg>
+    <div class="abs" style="left:0;right:0;height:2px;background:var(--c);box-shadow:0 0 18px var(--c);animation:scan 2.6s linear infinite;max-height:2px"></div>
+    <div class="abs r s" style="left:150px;top:310px;width:90px;height:170px;border:2px solid var(--g);--d:900"><span class="mono" style="position:absolute;top:-24px;left:-2px;background:var(--g);color:#05210f;font-size:11px;font-weight:700;padding:4px 6px;white-space:nowrap">ĐỦ BẢO HỘ</span></div>
+    <div class="abs r s" style="left:395px;top:140px;width:100px;height:170px;border:2px solid var(--r);--d:1300"><span class="mono" style="position:absolute;top:-24px;left:-2px;background:var(--r);color:#fff;font-size:11px;font-weight:700;padding:4px 6px;white-space:nowrap">THIẾU MŨ · THIẾU DÂY AN TOÀN</span></div>
+    <div class="abs r s" style="left:515px;top:310px;width:90px;height:170px;border:2px solid var(--g);--d:1600"><span class="mono" style="position:absolute;top:-24px;left:-2px;background:var(--g);color:#05210f;font-size:11px;font-weight:700;padding:4px 6px;white-space:nowrap">ĐỦ BẢO HỘ</span></div>
+    <div class="abs" style="left:24px;right:24px;top:540px;font:400 17px/1.4 var(--sans)">
+      <div class="r" style="--d:1900;display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line2)"><span class="ck" style="background:var(--r);color:#fff">!</span>Cảnh báo đã gửi tổ trưởng khu B, kèm ảnh khoanh vùng</div>
+      <div class="r" style="--d:2200;display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line2)"><span class="ck">✓</span>Biên bản nhắc nhở đã lập nháp, chờ ký</div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 UC4 DOCS -->
+<section class="slide" data-name="USE CASE 04" data-beam="100 340 600 4 0" data-ring="820 150 120 .5" data-grid="-320 -80">
+  <div class="uc-num r">04</div>
+  <div class="abs kick r" style="left:100px;top:140px">Use case 04 · Hồ sơ</div>
+  <div class="abs h2 r" style="left:100px;top:180px;width:620px;font-size:52px;--d:100">Agent lo <em>hồ sơ, RFI</em> và hợp đồng</div>
+  <div class="flow">
+    <div class="row r" style="--d:300"><span class="mono">ĐẦU VÀO</span>Hợp đồng, TCVN, chỉ dẫn kỹ thuật, thư từ các bên.</div>
+    <div class="row r" style="--d:420"><span class="mono">AGENT LÀM</span>Tra điều khoản, soạn nháp trả lời RFI và công văn kèm trích dẫn.</div>
+    <div class="row r" style="--d:540"><span class="mono">ĐẦU RA</span>Văn bản nháp, lịch hạn trả lời và nghiệm thu, nhắc trước.</div>
+  </div>
+  <div class="keep r" style="--d:700"><div class="hz"></div><div><b>CON NGƯỜI GIỮ</b>Mọi văn bản đi ra ngoài đều qua người ký duyệt.</div></div>
+  <div class="panel r rt" style="left:780px;top:130px;width:720px;height:690px;padding:40px;--d:200">
+    <span class="demo">MINH HỌA</span>
+    <div style="display:flex;align-items:center;gap:14px;border:1px solid var(--line2);border-radius:40px;padding:16px 24px;background:rgba(0,0,0,.25);margin-top:10px">
+      <span class="mono" style="color:var(--c)">⌕</span>
+      <span class="mono typing" style="display:inline-block;overflow:hidden;white-space:nowrap;border-right:2px solid var(--y);font-size:18px">điều khoản tạm ứng hợp đồng</span>
+    </div>
+    <div class="abs" style="left:40px;top:150px;width:640px;height:220px">
+      <div class="abs" style="left:24px;top:16px;width:600px;height:200px;background:#c9c3b6;border-radius:4px"></div>
+      <div class="abs" style="left:12px;top:8px;width:610px;height:200px;background:#ddd7cb;border-radius:4px"></div>
+      <div class="abs r" style="left:0;top:0;width:620px;height:200px;background:#f4f1ea;color:#1b2333;border-radius:4px;padding:20px 24px;--d:2400">
+        <div class="mono" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:#667">HỢP ĐỒNG THI CÔNG · MỤC TẠM ỨNG</div>
+        <i style="display:block;height:7px;background:#d9d4c8;border-radius:3px;margin-top:16px"></i>
+        <div style="margin-top:12px;background:rgba(255,194,26,.5);padding:8px 10px;font:600 16px/1.4 var(--sans)">Đoạn điều khoản liên quan được trích nguyên văn, kèm số trang.</div>
+        <i style="display:block;height:7px;background:#d9d4c8;border-radius:3px;margin-top:14px;width:75%"></i>
+      </div>
+    </div>
+    <div class="abs" style="left:40px;top:400px;width:640px">
+      <div class="mono" style="font-size:12px;letter-spacing:.14em;color:var(--mut);margin-bottom:12px">LỊCH HẠN AGENT ĐANG THEO DÕI</div>
+      <div class="r" style="--d:2700;display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--line2);font:600 19px var(--sans)">Trả lời RFI về thép chờ<span class="tag" style="color:var(--o)">SẮP TỚI HẠN</span></div>
+      <div class="r" style="--d:2900;display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--line2);font:600 19px var(--sans)">Nghiệm thu cốt thép móng<span class="tag" style="color:var(--c)">ĐÃ NHẮC</span></div>
+      <div class="r" style="--d:3100;display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--line2);font:600 19px var(--sans)">Công văn đổi vật liệu ốp<span class="tag" style="color:var(--g)">NHÁP CHỜ KÝ</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 UC5 PROCUREMENT -->
+<section class="slide" data-name="USE CASE 05" data-beam="100 340 600 4 0" data-ring="1290 300 210 .5" data-grid="-360 -40">
+  <div class="uc-num r">05</div>
+  <div class="abs kick r" style="left:100px;top:140px">Use case 05 · Vật tư</div>
+  <div class="abs h2 r" style="left:100px;top:180px;width:620px;font-size:52px;--d:100">Agent so giá, <em>mua vật tư</em></div>
+  <div class="flow">
+    <div class="row r" style="--d:300"><span class="mono">ĐẦU VÀO</span>Đề xuất vật tư từ hiện trường, báo giá các nhà cung cấp.</div>
+    <div class="row r" style="--d:420"><span class="mono">AGENT LÀM</span>Kiểm tồn kho, so giá, thời gian giao, điều kiện thanh toán.</div>
+    <div class="row r" style="--d:540"><span class="mono">ĐẦU RA</span>Phương án đề xuất có lý do, theo dõi giao hàng và nhập kho.</div>
+  </div>
+  <div class="keep r" style="--d:700"><div class="hz"></div><div><b>CON NGƯỜI GIỮ</b>Duyệt rồi agent mới được đặt hàng.</div></div>
+  <div class="panel r rt" style="left:780px;top:130px;width:720px;height:690px;padding:40px;--d:200">
+    <span class="demo">MINH HỌA</span>
+    <div style="font:800 24px var(--sans);margin-top:6px">Đề xuất: thép D16 cho sàn tầng 5</div>
+    <div class="mono" style="font-size:13px;color:var(--mut);margin:6px 0 30px;letter-spacing:.08em">TỒN KHO: KHÔNG ĐỦ · CẦN ĐẶT</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+      <script>
+      [['NCC A',[.85,.5,.6],0],['NCC B',[.7,.9,.85],1],['NCC C',[.55,.4,.7],0]].forEach(([n,v,best],k)=>document.write(`
+        <div class="r" style="--d:${500+k*250};border:${best?'2px solid var(--y)':'1px solid var(--line2)'};border-radius:8px;padding:20px;position:relative;background:${best?'rgba(255,194,26,.07)':'transparent'}">
+          ${best?'<span class="mono" style="position:absolute;top:-12px;left:16px;background:var(--y);color:#111;font-size:11px;font-weight:700;padding:4px 8px">ĐỀ XUẤT</span>':''}
+          <div style="font:800 22px var(--sans);margin-bottom:18px">${n}</div>
+          ${['GIÁ TỐT','GIAO NHANH','THANH TOÁN'].map((l,j)=>`<div class="mono" style="font-size:11px;color:var(--mut);letter-spacing:.1em;margin-top:14px">${l}</div><div style="height:10px;background:rgba(255,255,255,.07);border-radius:5px;margin-top:6px"><div class="bar grow" style="width:${v[j]*100}%;--d:${800+k*250+j*120};${best?'background:var(--y)':''}"></div></div>`).join('')}
+        </div>`))
+      </script>
+    </div>
+    <div class="p r" style="margin-top:30px;font-size:18px;--d:1800">Lý do: NCC B giá không thấp nhất nhưng giao kịp tiến độ đổ sàn và cho thanh toán sau.</div>
+    <div class="abs r s" style="right:50px;bottom:40px;--fr:-30deg;--fs:2.2;--d:2300"><div style="transform:rotate(-8deg);border:4px solid var(--r);color:var(--r);font:900 30px var(--mono);padding:10px 22px;letter-spacing:.1em;border-radius:6px">CHỜ DUYỆT</div></div>
+  </div>
+</section>
+
+<!-- 11 MULTI AGENT -->
+<section class="slide" data-name="NHIỀU AGENT" data-beam="1046 260 8 120 0" data-ring="900 350 300 .9" data-grid="-400 -120">
+  <div class="abs kick r" style="left:100px;top:170px">11 · Nhiều agent cùng làm</div>
+  <div class="abs h2 r" style="left:100px;top:210px;width:500px;--d:100">Một <em>ban chỉ huy&nbsp;số</em></div>
+  <div class="abs p r" style="left:100px;top:370px;width:470px;--d:300">Agent điều phối nhận yêu cầu, chia việc cho các agent chuyên trách. Tất cả dùng chung bộ nhớ dự án nên không phải hỏi lại.</div>
+  <div class="abs r" style="left:100px;top:600px;width:470px;--d:500;font:600 22px/1.45 var(--sans)">Con người là <span style="color:var(--y)">chỉ huy trưởng</span>: đặt mục tiêu, duyệt kết quả, chịu trách nhiệm.</div>
+  <svg class="abs" style="left:600px;top:80px" width="900" height="800" fill="none">
+    <g stroke="#3a5a90" stroke-width="2">
+      <path id="sp1" d="M450 420L736 370" pathLength="1" style="--d:600"/><path id="sp2" d="M450 420L672 606" pathLength="1" style="--d:700"/>
+      <path id="sp3" d="M450 420L450 710" pathLength="1" style="--d:800"/><path id="sp4" d="M450 420L228 606" pathLength="1" style="--d:900"/>
+      <path id="sp5" d="M450 420L164 370" pathLength="1" style="--d:1000"/>
+      <path d="M450 340L450 175" stroke="var(--y)" stroke-dasharray="6 6" pathLength="1" style="--d:400"/>
+    </g>
+    <g fill="var(--c)"><circle r="6"><animateMotion dur="2.2s" repeatCount="indefinite"><mpath href="#sp1"/></animateMotion></circle>
+      <circle r="6"><animateMotion dur="2.6s" begin=".4s" repeatCount="indefinite"><mpath href="#sp2"/></animateMotion></circle>
+      <circle r="6"><animateMotion dur="2s" begin=".9s" repeatCount="indefinite"><mpath href="#sp3"/></animateMotion></circle>
+      <circle r="6"><animateMotion dur="2.4s" begin=".2s" repeatCount="indefinite"><mpath href="#sp4"/></animateMotion></circle>
+      <circle r="6"><animateMotion dur="2.8s" begin="1.2s" repeatCount="indefinite"><mpath href="#sp5"/></animateMotion></circle></g>
+    <path id="memc" d="M450 270a150 150 0 1 1 -0.1 0" stroke="none"/>
+    <g style="transform-origin:450px 420px;animation:spin 30s linear infinite"><text fill="rgba(95,212,255,.7)" font-family="JetBrains Mono" font-size="13" letter-spacing="4"><textPath href="#memc">BỘ NHỚ DỰ ÁN · BỘ NHỚ DỰ ÁN · BỘ NHỚ DỰ ÁN · BỘ NHỚ DỰ ÁN ·</textPath></text></g>
+    <g class="r s" style="--d:300"><polygon points="450,340 519,380 519,460 450,500 381,460 381,380" fill="#14284a" stroke="var(--y)" stroke-width="3"/>
+      <text x="450" y="426" text-anchor="middle" fill="var(--y)" font-family="JetBrains Mono" font-weight="700" font-size="17" letter-spacing="2">ĐIỀU PHỐI</text></g>
+    <g class="r dn" style="--d:200"><circle cx="450" cy="120" r="44" fill="var(--y)"/><circle cx="450" cy="106" r="13" fill="#111"/><path d="M426 145a24 22 0 0 1 48 0" fill="#111"/></g>
+    <g fill="#0e1f3d" stroke="var(--c)" stroke-width="2">
+      <circle class="r s" style="--d:1100" cx="736" cy="370" r="48"/><circle class="r s" style="--d:1200" cx="672" cy="606" r="48"/>
+      <circle class="r s" style="--d:1300" cx="450" cy="710" r="48"/><circle class="r s" style="--d:1400" cx="228" cy="606" r="48"/><circle class="r s" style="--d:1500" cx="164" cy="370" r="48"/></g>
+    <g fill="var(--c)" font-family="JetBrains Mono" font-weight="700" font-size="13" text-anchor="middle">
+      <text x="736" y="375">QS</text><text x="672" y="611">TIẾN ĐỘ</text><text x="450" y="715">AN TOÀN</text><text x="228" y="611">HỒ SƠ</text><text x="164" y="375">VẬT TƯ</text></g>
+  </svg>
+  <div class="node-l r" style="left:1050px;top:105px;width:260px;margin-left:-130px;--d:300;color:var(--y)">CHỈ HUY TRƯỞNG<small>người thật, duyệt cuối</small></div>
+  <div class="node-l r" style="left:1336px;top:515px;--d:1150">Dự toán</div>
+  <div class="node-l r" style="left:1272px;top:750px;--d:1250">Tiến độ, nhật ký</div>
+  <div class="node-l r" style="left:828px;top:750px;--d:1450">Hồ sơ, hợp đồng</div>
+  <div class="node-l r" style="left:764px;top:515px;--d:1550">Mua sắm</div>
+</section>
+
+<!-- 12 ARCHITECTURE -->
+<section class="slide" data-name="KIẾN TRÚC" data-beam="700 142 800 14 0" data-ring="1300 40 160 .4" data-grid="-440 -160" data-stripe="1">
+  <div class="abs kick r" style="left:100px;top:170px">12 · Kiến trúc kỹ thuật</div>
+  <div class="abs h2 r" style="left:100px;top:210px;width:540px;--d:100">Xây hệ agent như <em>xây một tòa nhà</em></div>
+  <div class="abs p r" style="left:100px;top:440px;width:520px;--d:300">Dữ liệu đi từ móng lên mái. Không việc nào ra khỏi tòa nhà mà không qua <b style="color:var(--y)">cổng duyệt</b> trên cùng.</div>
+  <div class="floor r" style="top:690px;--d:300"><span class="lv">MÓNG</span><h4>Nguồn dữ liệu</h4><div class="chips"><span>bản vẽ</span><span>Excel</span><span>ảnh</span><span>Zalo</span><span>email</span><span>kế toán</span></div></div>
+  <div class="floor r" style="top:572px;--d:550"><span class="lv">TẦNG 1</span><h4>Lớp kết nối</h4><div class="chips"><span>MCP</span><span>API</span><span>quyền đọc ghi đúng chỗ</span></div></div>
+  <div class="floor r" style="top:454px;--d:800"><span class="lv">TẦNG 2</span><h4>Bộ não</h4><div class="chips"><span>mô hình ngôn ngữ lớn</span><span>bộ nhớ dự án</span></div></div>
+  <div class="floor r" style="top:336px;--d:1050"><span class="lv">TẦNG 3</span><h4>Công cụ</h4><div class="chips"><span>xuất Excel, Word</span><span>soạn tin nhắn</span><span>đọc ảnh</span></div></div>
+  <div class="floor r" style="top:218px;--d:1300;border-color:rgba(255,194,26,.6);background:linear-gradient(90deg,rgba(255,194,26,.16),rgba(14,28,52,.9))"><span class="lv" style="color:var(--y)">MÁI</span><h4>Cổng duyệt</h4><div class="chips"><span style="border-color:var(--y);color:var(--y)">gửi ra ngoài</span><span style="border-color:var(--y);color:var(--y)">ký</span><span style="border-color:var(--y);color:var(--y)">chi tiền</span></div></div>
+  <div class="abs" style="left:1418px;top:218px;width:40px;height:584px;border-left:1px dashed var(--line2);border-right:1px dashed var(--line2);overflow:hidden">
+    <div class="particle" style="left:16px;top:575px"></div><div class="particle" style="left:16px;top:575px;animation-delay:.8s"></div>
+    <div class="particle" style="left:16px;top:575px;animation-delay:1.6s"></div><div class="particle" style="left:16px;top:575px;animation-delay:2.4s"></div>
+  </div>
+</section>
+
+<!-- 13 RISKS -->
+<section class="slide" data-name="RỦI RO" data-beam="100 300 1400 26 0" data-ring="1240 40 280 .3" data-grid="-480 -120" data-stripe="1">
+  <div class="abs kick r" style="left:100px;top:130px;color:var(--r)">13 · Rủi ro và rào chắn</div>
+  <div class="abs h2 r" style="left:100px;top:170px;--d:100">Dựng rào chắn <em>trước</em> khi cho agent vào việc</div>
+  <div class="risk r dn" style="left:100px;--d:300"><div class="hz"></div><span class="mono">R1</span><h3>Bịa số liệu</h3><p>Mỗi con số phải ghi nguồn. <b>Không có nguồn thì không dùng.</b></p></div>
+  <div class="risk r dn" style="left:458px;--d:450"><div class="hz"></div><span class="mono">R2</span><h3>Lộ dữ liệu</h3><p>Bản vẽ, hợp đồng chỉ cho agent đọc <b>trong phạm vi dự án</b>.</p></div>
+  <div class="risk r dn" style="left:816px;--d:600"><div class="hz"></div><span class="mono">R3</span><h3>Làm quá quyền</h3><p>Gửi ra ngoài, ký, chi tiền <b>luôn cần người duyệt</b>.</p></div>
+  <div class="risk r dn" style="left:1174px;--d:750"><div class="hz"></div><span class="mono">R4</span><h3>Tin mù quáng</h3><p>Kỹ sư vẫn ra hiện trường. <b>Agent chỉ gánh phần giấy tờ.</b></p></div>
+</section>
+
+<!-- 14 ROADMAP -->
+<section class="slide" data-name="LỘ TRÌNH" data-beam="1386 250 6 420 0" data-ring="1310 170 150 .6" data-grid="-520 -80">
+  <div class="abs kick r" style="left:100px;top:110px">14 · Bắt đầu thế nào</div>
+  <div class="abs h2 r" style="left:100px;top:145px;--d:100">Lộ trình <em>90 ngày</em></div>
+  <svg id="gantt" class="abs" style="left:400px;top:250px" width="1000" height="440" fill="none" stroke="rgba(120,170,255,.18)">
+  </svg>
+  <div class="gl" style="left:400px;top:225px">THÁNG 1</div><div class="gl" style="left:708px;top:225px">THÁNG 2</div><div class="gl" style="left:1016px;top:225px">THÁNG 3</div>
+  <div class="gl" style="left:100px;top:290px;font-size:14px;color:var(--y)">CHỌN VIỆC</div>
+  <div class="gbar grow" style="left:400px;top:270px;width:300px;background:var(--y);--d:300">Chọn 1 việc đau nhất</div>
+  <div class="gtask r" style="left:100px;top:330px;width:290px;--d:500;font-size:16px">Gom dữ liệu mẫu, viết lại quy trình đang làm.</div>
+  <div class="gl" style="left:100px;top:430px;font-size:14px;color:var(--c)">THÍ ĐIỂM</div>
+  <div class="gbar grow" style="left:708px;top:410px;width:300px;background:var(--c);--d:700">1 công trường, 1 đội</div>
+  <div class="gtask r" style="left:100px;top:470px;width:290px;--d:900;font-size:16px">Chạy song song cách làm cũ để so.</div>
+  <div class="gl" style="left:100px;top:570px;font-size:14px;color:var(--g)">ĐO, QUYẾT ĐỊNH</div>
+  <div class="gbar grow" style="left:1016px;top:550px;width:300px;background:var(--g);--d:1100">Đo kết quả thật</div>
+  <div class="gtask r" style="left:100px;top:610px;width:290px;--d:1300;font-size:16px">Đạt thì nhân rộng, chưa đạt thì sửa.</div>
+  <div class="abs r" style="left:1402px;top:600px;width:110px;font:700 13px/1.4 var(--mono);color:var(--y);letter-spacing:.08em;--d:1500">CỔNG: ĐO ĐƯỢC MỚI NHÂN RỘNG</div>
+  <div class="abs r" style="left:100px;top:740px;--d:1700"><span class="kpi"><i></i>Giờ tiết kiệm mỗi tuần</span><span class="kpi"><i></i>Lỗi phát hiện sớm</span><span class="kpi" style="border-color:rgba(255,77,94,.5)"><i style="background:var(--r);box-shadow:0 0 10px var(--r)"></i>Không đo được thì chưa nhân rộng</span></div>
+</section>
+
+<!-- 15 CLOSE -->
+<section class="slide" data-name="KẾT" data-beam="100 640 340 12 0" data-ring="930 100 760 .5" data-grid="0 0">
+  <div class="abs kick r" style="left:100px;top:200px">15 · Lời kết</div>
+  <div class="abs h2 r" style="left:100px;top:245px;width:800px;font-size:70px;--d:100">Agent không thay kỹ&nbsp;sư.</div>
+  <div class="abs h2 r" style="left:100px;top:420px;width:760px;font-size:40px;font-weight:600;line-height:1.3;--d:400;color:var(--y)">Agent gánh phần giấy tờ để kỹ sư quay về công trường.</div>
+  <div class="abs r" style="left:100px;top:690px;--d:800;display:flex;gap:12px">
+    <span class="tag" style="color:var(--paper);font-size:15px;padding:12px 16px">1 VIỆC</span><span class="tag" style="color:var(--paper);font-size:15px;padding:12px 16px">1 CÔNG TRƯỜNG</span><span class="tag" style="color:var(--y);font-size:15px;padding:12px 16px">90 NGÀY</span></div>
+  <svg class="abs" style="left:880px;top:90px" width="660" height="760" viewBox="0 0 660 760" fill="none">
+    <line x1="40" y1="720" x2="620" y2="720" stroke="#5f7fb5" stroke-width="2"/>
+    <rect x="120" y="270" width="360" height="450" fill="#12244a" stroke="#cfdcf4" stroke-width="3" pathLength="1" style="--d:0"/>
+    <g stroke="#cfdcf4" stroke-width="3"><line x1="120" y1="630" x2="480" y2="630"/><line x1="120" y1="540" x2="480" y2="540"/><line x1="120" y1="450" x2="480" y2="450"/><line x1="120" y1="360" x2="480" y2="360"/></g>
+    <g id="wins"></g>
+    <line x1="300" y1="270" x2="300" y2="170" stroke="#cfdcf4" stroke-width="3"/>
+    <path d="M300 170h70l-14 18 14 18h-70z" fill="var(--y)" style="transform-origin:300px 188px;animation:sway 3s ease-in-out infinite"/>
+    <circle cx="300" cy="270" r="9" fill="var(--c)"/><circle cx="300" cy="270" r="9" fill="none" stroke="var(--c)"><animate attributeName="r" values="9;30;9" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/></circle>
+  </svg>
+</section>
+</div>
+
+<script>
+const stage=document.getElementById('stage'),slides=[...document.querySelectorAll('.slide')],
+  beam=document.getElementById('beam'),ring=document.getElementById('ring'),grid=document.getElementById('grid'),
+  wipe=document.getElementById('wipe'),N=slides.length;
+let cur=-1;
+function fit(){const s=Math.min(innerWidth/1600,innerHeight/900);Object.assign(stage.style,{transformOrigin:'0 0',transform:`scale(${s})`,left:(innerWidth-1600*s)/2+'px',top:(innerHeight-900*s)/2+'px'})}
+const NS='http://www.w3.org/2000/svg';
+function svgEl(t,a,st){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(st)e.setAttribute('style',st);return e}
+for(let i=0;i<14;i++)document.getElementById('gantt').append(svgEl('line',{x1:i*76.9,y1:0,x2:i*76.9,y2:420}));
+for(let f=0;f<5;f++)for(let c=0;c<4;c++)document.getElementById('wins').append(svgEl('rect',{x:140+c*86,y:290+f*90,width:62,height:50,fill:'#1d3463'},`--wd:${1+((f*4+c)*37%20)*.12}s`));
+function go(n){
+  n=Math.max(0,Math.min(N-1,n)); if(n===cur)return;
+  if(cur>=0){slides[cur].classList.remove('on');wipe.classList.remove('go');void wipe.offsetWidth;wipe.classList.add('go')}
+  cur=n; const s=slides[n]; s.classList.add('on');
+  const [bx,by,bw,bh,br]=s.dataset.beam.split(' ').map(Number);
+  Object.assign(beam.style,{transform:`translate(${bx}px,${by}px) rotate(${br}deg)`,width:bw+'px',height:bh+'px'});
+  beam.style.setProperty('--stripe',s.dataset.stripe||0);
+  const [rx,ry,rd,ro]=s.dataset.ring.split(' ').map(Number);
+  Object.assign(ring.style,{transform:`translate(${rx}px,${ry}px)`,width:rd+'px',height:rd+'px',opacity:ro});
+  const [gx,gy]=s.dataset.grid.split(' ');grid.style.transform=`translate(${gx}px,${gy}px)`;
+  document.getElementById('sname').textContent=s.dataset.name;
+  document.getElementById('snum').textContent=`BV-${String(n+1).padStart(2,'0')} / ${N}`;
+  document.querySelector('#ruler i').style.width=((n+1)/N*100)+'%';
+  history.replaceState(null,'','#'+(n+1));
+}
+fit();addEventListener('resize',fit);
+addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();go(cur+1)}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)){e.preventDefault();go(cur-1)}
+  else if(e.key==='Home')go(0);else if(e.key==='End')go(N-1);
+  else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+});
+addEventListener('click',e=>go(cur+(e.clientX>innerWidth/3?1:-1)));
+let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>40)go(cur+(d<0?1:-1));tx=null});
+requestAnimationFrame(()=>go((parseInt(location.hash.slice(1))||1)-1));
+</script>
+</body>
+</html>

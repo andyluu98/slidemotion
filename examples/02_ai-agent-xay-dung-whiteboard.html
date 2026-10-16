@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Agent cho xây dựng (bảng trắng)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@500;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+.sm-stage {
+  --bg: #F4F4EF; --ink: #23262c; --blue: #2a5cb3; --orange: #d97757; --orange-d: #b5502b; --muted: #4A505A;
+  --display: 'Playpen Sans', sans-serif; --hand: 'Patrick Hand', 'Playpen Sans', sans-serif;
+  color: var(--ink); font-family: var(--display);
+  background: radial-gradient(ellipse 80% 70% at 30% 22%, #fff 0%, rgba(255,255,255,0) 70%), linear-gradient(180deg, #F6F6F1, #ECECE5);
+}
+/* nét bút */
+.k { fill: none; stroke: var(--ink); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.b { fill: none; stroke: var(--blue); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.o { fill: none; stroke: var(--orange); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.thin { stroke-width: 4; }
+.dots { fill: none; stroke: var(--blue); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 1 20; }
+.abs { position: absolute; margin: 0; }
+.t { position: absolute; left: 120px; top: 80px; margin: 0; font: 800 72px/1.15 var(--display); max-width: 1500px; }
+.p { font: 500 32px/1.5 var(--display); color: var(--muted); }
+.hand { font-family: var(--hand); }
+/* hộp vẽ tay bằng viền CSS */
+.box { position: absolute; font: 500 28px/1.35 var(--display); border: 5px solid var(--ink); border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px; padding: 26px 30px; background: rgba(255,255,255,.35); }
+.box.blue { border-color: var(--blue); }
+.box.orange { border-color: var(--orange); }
+.magnet { position: absolute; width: 40px; height: 40px; border-radius: 50%; background: var(--orange); box-shadow: 0 6px 0 rgba(0,0,0,.12); left: 50%; top: -22px; margin-left: -20px; }
+.tag { font: 400 30px var(--hand); color: var(--blue); }
+svg.layer { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+/* bóng ma bài cũ + bút cam xuyên suốt */
+#ghost { position: absolute; inset: 0; opacity: .5; }
+#pen { position: absolute; left: 0; top: 0; z-index: 5; transition: transform 1.2s cubic-bezier(.7,0,.2,1); pointer-events: none; }
+.sm-stage[data-scene=bia] #pen { transform: translate(1580px, 860px) rotate(-28deg); }
+.sm-stage[data-scene=van-de] #pen { transform: translate(840px, 960px) rotate(-8deg); }
+.sm-stage[data-scene=so-sanh] #pen { transform: translate(1560px, 90px) rotate(18deg); }
+.sm-stage[data-scene=vong-lap] #pen { transform: translate(1580px, 150px) rotate(-40deg); }
+.sm-stage[data-scene=viec] #pen { transform: translate(1520px, 940px) rotate(-4deg); }
+.sm-stage[data-scene=chi-huy] #pen { transform: translate(1520px, 160px) rotate(24deg); }
+.sm-stage[data-scene=rao-chan] #pen { transform: translate(1580px, 950px) rotate(-12deg); }
+.sm-stage[data-scene=lo-trinh] #pen { transform: translate(140px, 930px) rotate(-6deg); }
+.sm-stage[data-scene=ket] #pen { transform: translate(1480px, 860px) rotate(-34deg); }
+</style>
+</head>
+<body>
+<div class="sm-stage">
+  <svg id="ghost" viewBox="0 0 1920 1080" fill="none" stroke="#6a7388" stroke-opacity=".14" stroke-width="5" stroke-dasharray="9 12" stroke-linecap="round">
+    <path d="M1300 120Q1420 60 1560 130M1580 120l-30-6M1580 120l-14 26"/><path d="M200 930C320 880 420 990 560 920"/><circle cx="1720" cy="980" r="46"/>
+  </svg>
+
+  <!-- 1 BÌA -->
+  <section class="slide" data-scene="bia">
+    <p class="abs tag" style="left:130px;top:150px" data-anim="wipe">buổi chia sẻ · bản vẽ trên bảng</p>
+    <h1 id="c-title" class="abs" style="left:120px;top:280px;font:800 190px/1 var(--display);letter-spacing:-.03em" data-anim="wipe" data-delay="150">AI Agent</h1>
+    <svg class="layer" width="1920" height="1080"><path class="o" data-hand="around #c-title 60 40 1.2 3" data-anim="draw" data-delay="900" data-dur="1100"/></svg>
+    <p class="abs" style="left:126px;top:560px;font:700 84px/1.1 var(--display)" data-anim="wipe" data-delay="500">cho ngành xây dựng</p>
+    <p class="abs hand" style="left:130px;top:720px;font-size:48px;color:var(--blue);max-width:860px" data-anim="fade" data-delay="1300">Từ trợ lý biết trả lời sang đồng nghiệp biết làm việc trên công trường</p>
+    <svg class="layer" width="1920" height="1080">
+      <g data-anim="draw" data-delay="300" data-stagger="110">
+        <path class="k" data-hand="line 1120 900 1820 900"/>
+        <path class="k" data-hand="line 1200 900 1200 470"/><path class="k" data-hand="line 1360 900 1360 470"/><path class="k" data-hand="line 1520 900 1520 470"/>
+        <path class="k" data-hand="line 1190 790 1530 790"/><path class="k" data-hand="line 1190 680 1530 680"/><path class="k" data-hand="line 1190 575 1530 575"/><path class="k" data-hand="line 1190 470 1530 470"/>
+        <path class="k thin" data-hand="line 1700 900 1700 250"/><path class="k thin" data-hand="line 1250 260 1800 260"/><path class="k thin" d="M1700 250L1760 210L1800 260"/>
+      </g>
+      <g data-loop="sway" style="transform-origin:1420px 260px">
+        <path class="k thin" d="M1420 262V380"/><rect x="1360" y="380" width="120" height="22" rx="6" fill="var(--orange)"/>
+      </g>
+      <path id="climb" class="dots" d="M1200 900H1520V790H1200V680H1520V575H1200V470" data-anim="fade" data-delay="1600"/>
+      <circle r="14" fill="var(--blue)"><animateMotion dur="7s" repeatCount="indefinite"><mpath href="#climb"/></animateMotion></circle>
+    </svg>
+  </section>
+
+  <!-- 2 VẤN ĐỀ -->
+  <section class="slide" data-scene="van-de">
+    <h2 class="t" data-anim="wipe">Công trường ngập giấy tờ</h2>
+    <div class="abs p" style="left:120px;top:250px;width:720px" data-stagger="180" data-delay="300">
+      <p data-anim="rise" style="margin:0 0 26px">Kỹ sư mất nhiều giờ cho nhật ký, biên bản, báo cáo.</p>
+      <p data-anim="rise" style="margin:0 0 26px">Ảnh ở Zalo, khối lượng ở Excel, thay đổi thiết kế ở email.</p>
+      <p data-anim="rise" style="margin:0">Sai sót phát hiện muộn, nghiệm thu tranh cãi.</p>
+    </div>
+    <svg class="layer" width="1920" height="1080"><path class="b thin" d="M1080 330C1300 180 1240 520 1530 330S1220 640 1150 600S1600 700 1560 600S1040 880 1160 860" data-anim="draw" data-delay="900" data-dur="1800"/></svg>
+    <div class="box" style="left:960px;top:200px;width:360px;rotate:-6deg" data-anim="drop" data-delay="200"><div data-loop="float"><b class="tag">Zalo</b><br>Ảnh, tin thoại nhóm công trường</div></div>
+    <div class="box blue" style="left:1400px;top:220px;width:380px;rotate:5deg" data-anim="drop" data-delay="350"><div data-loop="float"><b class="tag">Excel</b><br>khoi-luong_final_v3.xlsx</div></div>
+    <div class="box" style="left:1030px;top:470px;width:360px;rotate:4deg" data-anim="drop" data-delay="500"><div data-loop="float"><b class="tag">Email</b><br>Thay đổi thiết kế rev C</div></div>
+    <div class="box blue" style="left:1460px;top:500px;width:340px;rotate:-5deg" data-anim="drop" data-delay="650"><div data-loop="float"><b class="tag">Giấy</b><br>Nhật ký viết tay</div></div>
+    <div class="box" style="left:980px;top:750px;width:340px;rotate:-3deg" data-anim="drop" data-delay="800"><div data-loop="float"><b class="tag">PDF</b><br>Biên bản chờ ký</div></div>
+    <div class="box blue" style="left:1420px;top:780px;width:370px;rotate:6deg" data-anim="drop" data-delay="950"><div data-loop="float"><b class="tag">Điện thoại</b><br>"Anh ơi đổi thép chưa?"</div></div>
+    <p id="v-key" class="abs hand" style="left:170px;top:760px;font-size:62px;color:var(--orange-d)" data-anim="wipe" data-delay="1500">Thiếu người gom dữ liệu</p>
+    <svg class="layer" width="1920" height="1080"><path class="o" data-hand="around #v-key 60 30 1.25 5" data-anim="draw" data-delay="2000"/></svg>
+  </section>
+
+  <!-- 3 CHATBOT vs AGENT -->
+  <section class="slide" data-scene="so-sanh">
+    <h2 class="t" data-anim="wipe">Chatbot trả lời. Agent làm việc.</h2>
+    <div class="box" style="left:120px;top:250px;width:760px;height:560px" data-anim="left" data-delay="200">
+      <p class="tag" style="margin:0 0 20px">Chatbot</p>
+      <p style="font:500 32px/1.45 var(--display);margin:0 0 18px">Hỏi: nhật ký thi công gồm mục gì?</p>
+      <p style="font:500 32px/1.45 var(--display);margin:0;color:var(--muted)">Đáp: thời tiết, nhân lực, thiết bị, khối lượng...</p>
+      <p class="hand" style="position:absolute;left:30px;bottom:26px;font-size:46px;margin:0;color:var(--muted)">...rồi hết. Việc vẫn nằm đó.</p>
+    </div>
+    <div class="box orange" style="left:1000px;top:250px;width:800px;height:560px" data-anim="right" data-delay="450">
+      <span class="tag" style="display:inline-block;font-size:40px;color:var(--orange-d)" data-morph="agent">Agent</span>
+      <p style="font:700 34px/1.4 var(--display);margin:14px 0 22px">"Lập nhật ký hôm nay cho block B"</p>
+      <div style="font:500 30px/1.4 var(--display)" data-stagger="350">
+        <p data-step="1" data-anim="left" style="margin:0 0 16px">✓ đọc ảnh, tin trong nhóm Zalo</p>
+        <p data-step="1" data-anim="left" style="margin:0 0 16px">✓ mở file tiến độ, so kế hoạch</p>
+        <p data-step="1" data-anim="left" style="margin:0 0 16px">✓ viết nhật ký đúng mẫu</p>
+        <p data-step="1" data-anim="left" style="margin:0;color:var(--orange-d)">→ gửi chỉ huy trưởng duyệt</p>
+      </div>
+    </div>
+    <p class="abs p" style="left:120px;top:880px;width:1680px" data-anim="fade" data-delay="900">Chatbot như người tra cứu thư viện. Agent như kỹ sư phụ việc được giao đầu việc.</p>
+  </section>
+
+  <!-- 4 VÒNG LẶP -->
+  <section class="slide" data-scene="vong-lap">
+    <h2 class="t" style="max-width:520px" data-anim="wipe">Agent làm theo vòng lặp</h2>
+    <p class="abs p" style="left:120px;top:420px;width:430px" data-anim="rise" data-delay="300">Sai bước nào thì quay lại bước đó, như kỹ sư tính lại trước khi trình ký.</p>
+    <svg class="layer" width="1920" height="1080">
+      <path id="loop" class="b" data-hand="ellipse 1180 560 300 300 1.08 2" data-anim="draw" data-delay="200" data-dur="1600"/>
+      <circle r="16" fill="var(--orange)"><animateMotion dur="6s" repeatCount="indefinite"><mpath href="#loop"/></animateMotion></circle>
+      <g data-anim="draw" data-delay="900" data-stagger="160">
+        <path class="k" data-hand="ellipse 1180 260 34 34 1.2 1"/><path class="k" data-hand="ellipse 1465 467 34 34 1.2 2"/>
+        <path class="k" data-hand="ellipse 1356 803 34 34 1.2 3"/><path class="k" data-hand="ellipse 1004 803 34 34 1.2 4"/><path class="k" data-hand="ellipse 895 467 34 34 1.2 5"/>
+      </g>
+    </svg>
+    <div class="hand" style="font-size:40px">
+      <span class="abs" style="left:1146px;top:234px;width:68px;text-align:center" data-anim="pop" data-delay="1000">1</span><span class="abs" style="left:1431px;top:441px;width:68px;text-align:center" data-anim="pop" data-delay="1160">2</span>
+      <span class="abs" style="left:1322px;top:777px;width:68px;text-align:center" data-anim="pop" data-delay="1320">3</span><span class="abs" style="left:970px;top:777px;width:68px;text-align:center" data-anim="pop" data-delay="1480">4</span>
+      <span class="abs" style="left:861px;top:441px;width:68px;text-align:center" data-anim="pop" data-delay="1640">5</span>
+    </div>
+    <span class="abs hand" style="left:1080px;top:520px;width:200px;text-align:center;font-size:60px;color:var(--orange-d)" data-morph="agent">Agent</span>
+    <div style="font:700 30px/1.25 var(--display)">
+      <p class="abs" style="left:1240px;top:190px" data-anim="fade" data-delay="1100">Nhận việc</p>
+      <p class="abs" style="left:1540px;top:440px;width:260px" data-anim="fade" data-delay="1260">Lập kế hoạch<br><span class="tag">cần ảnh, tin, tiến độ</span></p>
+      <p class="abs" style="left:1410px;top:790px;width:330px" data-anim="fade" data-delay="1420">Dùng công cụ<br><span class="tag">Zalo, Excel, đọc ảnh</span></p>
+      <p class="abs" style="left:610px;top:790px;width:330px;text-align:right" data-anim="fade" data-delay="1580">Tự kiểm tra<br><span class="tag">khớp khối lượng</span></p>
+      <p class="abs" style="left:540px;top:440px;width:300px;text-align:right" data-anim="fade" data-delay="1740">Báo cáo<br><span class="tag">chờ duyệt</span></p>
+    </div>
+  </section>
+
+  <!-- 5 NĂM VIỆC -->
+  <section class="slide" data-scene="viec">
+    <h2 class="t" data-anim="wipe">Năm việc agent gánh trên công trường</h2>
+    <svg class="layer" width="1920" height="1080"><g data-anim="draw" data-delay="200" data-stagger="200">
+      <path class="k" data-hand="line 100 640 1820 640"/><path class="k" data-hand="line 100 668 1820 668"/></g></svg>
+    <div data-stagger="180" data-delay="600">
+      <div class="box" style="left:120px;top:300px;width:300px;height:300px" data-anim="drop"><span class="magnet"></span><p class="tag" style="margin:0">dự toán</p><p style="font:500 28px/1.35 var(--display);margin:10px 0 0">Đọc bản vẽ, bóc khối lượng, ghi nguồn từng dòng</p></div>
+      <div class="box" style="left:460px;top:300px;width:300px;height:300px" data-anim="drop"><span class="magnet"></span><p class="tag" style="margin:0">nhật ký</p><p style="font:500 28px/1.35 var(--display);margin:10px 0 0">Gom ảnh, tin thoại thành nhật ký, gắn cờ chậm</p></div>
+      <div class="box orange" style="left:800px;top:300px;width:300px;height:300px" data-anim="drop"><span class="magnet"></span><p class="tag" style="margin:0;color:var(--orange-d)">an toàn</p><p style="font:500 28px/1.35 var(--display);margin:10px 0 0">Soi ảnh, báo thiếu mũ, thiếu dây an toàn</p></div>
+      <div class="box" style="left:1140px;top:300px;width:300px;height:300px" data-anim="drop"><span class="magnet"></span><p class="tag" style="margin:0">hồ sơ</p><p style="font:500 28px/1.35 var(--display);margin:10px 0 0">Tra hợp đồng, soạn nháp RFI, canh hạn</p></div>
+      <div class="box" style="left:1480px;top:300px;width:300px;height:300px" data-anim="drop"><span class="magnet"></span><p class="tag" style="margin:0">vật tư</p><p style="font:500 28px/1.35 var(--display);margin:10px 0 0">So báo giá, kiểm kho, chờ duyệt mới đặt</p></div>
+    </div>
+    <p class="abs hand" style="left:120px;top:760px;font-size:52px;color:var(--blue)" data-anim="wipe" data-delay="1700">Chỗ nào lặp lại, nhiều giấy tờ: agent vào trước.</p>
+  </section>
+
+  <!-- 6 BAN CHỈ HUY SỐ -->
+  <section class="slide" data-scene="chi-huy">
+    <h2 class="t" style="max-width:660px" data-anim="wipe">Nhiều agent, một ban chỉ huy&nbsp;số</h2>
+    <p class="abs p" style="left:120px;top:420px;width:500px" data-anim="rise" data-delay="300">Agent điều phối chia việc cho các agent chuyên trách. Chung một bộ nhớ dự án nên không hỏi lại.</p>
+    <svg class="layer" width="1920" height="1080">
+      <g data-anim="draw" data-delay="700" data-stagger="120">
+        <path class="b thin" data-hand="line 1180 560 880 470"/><path class="b thin" data-hand="line 1180 560 900 790"/><path class="b thin" data-hand="line 1180 560 1180 880"/>
+        <path class="b thin" data-hand="line 1180 560 1460 790"/><path class="b thin" data-hand="line 1180 560 1480 470"/>
+      </g>
+      <path class="o" data-hand="line 1180 450 1180 300" data-anim="fade" data-delay="500" stroke-dasharray="14 14"/>
+      <path class="k" data-hand="ellipse 1180 560 120 110 1.15 7" data-anim="draw" data-delay="200" style="fill:#F7F7F2"/>
+    </svg>
+    <p class="abs hand" style="left:1080px;top:528px;width:200px;text-align:center;font-size:44px" data-anim="pop" data-delay="400">điều phối</p>
+    <div class="box orange" style="left:1010px;top:190px;width:340px;text-align:center;padding:16px" data-anim="drop" data-delay="200"><b style="font:800 32px var(--display)">Chỉ huy trưởng</b><br><span class="tag" style="color:var(--orange-d)">người thật</span></div>
+    <div style="font:700 28px var(--display)" data-stagger="120" data-delay="900">
+      <div class="box" style="left:690px;top:420px;width:230px;padding:14px 20px;text-align:center" data-anim="pop">Dự toán</div>
+      <div class="box" style="left:720px;top:750px;width:230px;padding:14px 20px;text-align:center" data-anim="pop">Tiến độ</div>
+      <div class="box" style="left:1065px;top:870px;width:230px;padding:14px 20px;text-align:center" data-anim="pop">An toàn</div>
+      <div class="box" style="left:1410px;top:750px;width:230px;padding:14px 20px;text-align:center" data-anim="pop">Hồ sơ</div>
+      <div class="box" style="left:1430px;top:420px;width:230px;padding:14px 20px;text-align:center" data-anim="pop">Vật tư</div>
+    </div>
+    <p class="abs hand" style="left:1380px;top:220px;font-size:46px;color:var(--orange-d)" data-step="1" data-anim="stamp">✓ duyệt cuối</p>
+  </section>
+
+  <!-- 7 RÀO CHẮN -->
+  <section class="slide" data-scene="rao-chan">
+    <h2 class="t" data-anim="wipe">Rào chắn trước khi cho agent vào việc</h2>
+    <div style="font:700 40px var(--display)">
+      <p class="abs" style="left:120px;top:270px" data-anim="fade" data-delay="200">Bịa số liệu</p>
+      <p class="abs" style="left:120px;top:440px" data-anim="fade" data-delay="300">Lộ dữ liệu</p>
+      <p class="abs" style="left:120px;top:610px" data-anim="fade" data-delay="400">Làm quá quyền</p>
+      <p class="abs" style="left:120px;top:780px" data-anim="fade" data-delay="500">Tin mù quáng</p>
+    </div>
+    <svg class="layer" width="1920" height="1080">
+      <g data-anim="draw" data-delay="900" data-stagger="350">
+        <path class="o" data-hand="line 110 300 420 296"/><path class="o" data-hand="line 110 470 400 466"/>
+        <path class="o" data-hand="line 110 640 470 636"/><path class="o" data-hand="line 110 810 430 806"/>
+      </g>
+      <g data-anim="draw" data-delay="1100" data-stagger="350">
+        <path class="b" d="M540 300H640M620 286l22 14-22 14"/><path class="b" d="M540 470H640M620 456l22 14-22 14"/>
+        <path class="b" d="M540 640H640M620 626l22 14-22 14"/><path class="b" d="M540 810H640M620 796l22 14-22 14"/>
+      </g>
+    </svg>
+    <div style="font:500 34px/1.35 var(--display)" data-stagger="350" data-delay="1300">
+      <p class="abs" style="left:690px;top:274px;width:1110px" data-anim="wipe">Số nào cũng ghi nguồn, không nguồn thì không dùng.</p>
+      <p class="abs" style="left:690px;top:444px;width:1110px" data-anim="wipe">Bản vẽ, hợp đồng chỉ đọc trong phạm vi dự án.</p>
+      <p class="abs" style="left:690px;top:614px;width:1110px" data-anim="wipe">Gửi ra ngoài, ký, chi tiền: luôn có người duyệt.</p>
+      <p class="abs" style="left:690px;top:784px;width:1110px" data-anim="wipe">Kỹ sư vẫn ra hiện trường, agent chỉ gánh giấy tờ.</p>
+    </div>
+  </section>
+
+  <!-- 8 LỘ TRÌNH -->
+  <section class="slide" data-scene="lo-trinh">
+    <h2 class="t" data-anim="wipe">Bắt đầu thế nào</h2>
+    <p class="abs" style="left:100px;top:230px;font:800 340px/1 var(--display);color:var(--orange)"><span data-count="90" data-dur="1600">90</span></p>
+    <p class="abs hand" style="left:140px;top:580px;font-size:80px" data-anim="wipe" data-delay="900">ngày thí điểm</p>
+    <svg class="layer" width="1920" height="1080"><g data-anim="draw" data-delay="1000" data-stagger="400">
+      <path class="b" d="M1180 360Q1240 380 1250 440M1236 422l14 20 10-24"/><path class="b" d="M1480 590Q1540 610 1550 670M1536 652l14 20 10-24"/></g></svg>
+    <div data-stagger="400" data-delay="700">
+      <div class="box" style="left:780px;top:200px;width:420px" data-anim="drop"><span class="magnet"></span><p class="tag" style="margin:0">tháng 1</p><p style="font:600 30px/1.35 var(--display);margin:6px 0 0">Chọn một việc tốn giờ nhất, gom dữ liệu mẫu</p></div>
+      <div class="box" style="left:1080px;top:430px;width:420px" data-anim="drop"><span class="magnet"></span><p class="tag" style="margin:0">tháng 2</p><p style="font:600 30px/1.35 var(--display);margin:6px 0 0">Thí điểm một công trường, chạy song song cách cũ</p></div>
+      <div class="box orange" style="left:1380px;top:660px;width:420px" data-anim="drop"><span class="magnet"></span><p class="tag" style="margin:0;color:var(--orange-d)">tháng 3</p><p style="font:600 30px/1.35 var(--display);margin:6px 0 0">Đo giờ tiết kiệm, lỗi phát hiện sớm rồi mới quyết</p></div>
+    </div>
+    <p class="abs p" style="left:140px;top:760px;width:560px;color:var(--ink)" data-anim="rise" data-delay="2000">Không đo được thì chưa nhân rộng.</p>
+    <svg class="layer" width="1920" height="1080"><path class="o" data-hand="line 140 820 640 816" data-anim="draw" data-delay="2300"/></svg>
+  </section>
+
+  <!-- 9 KẾT -->
+  <section class="slide" data-scene="ket">
+    <h2 class="abs" style="left:120px;top:250px;font:800 110px/1.1 var(--display);max-width:1500px" data-anim="wipe">Agent không thay kỹ sư.</h2>
+    <p class="abs" style="left:126px;top:470px;font:600 56px/1.35 var(--display);max-width:1200px;color:var(--muted)" data-anim="wipe" data-delay="500">Agent gánh phần giấy tờ<br>để kỹ sư <span id="k-key" style="color:var(--orange-d)">quay về công trường</span>.</p>
+    <svg class="layer" width="1920" height="1080">
+      <path class="o" data-hand="around #k-key 36 12 1.15 4" data-anim="draw" data-delay="1400"/>
+      <path class="b" d="M1460 760L1540 850L1720 640" data-anim="draw" data-delay="2000" style="stroke-width:12"/>
+    </svg>
+    <p class="abs hand" style="left:130px;top:760px;font-size:48px;color:var(--blue)" data-anim="fade" data-delay="2200">một việc · một công trường · 90 ngày</p>
+  </section>
+
+  <!-- bút cam xuyên suốt: đi theo data-scene -->
+  <svg id="pen" width="300" height="60" viewBox="0 0 300 60">
+    <g data-loop="float">
+      <rect x="40" y="12" width="210" height="36" rx="10" fill="#fff" stroke="#23262c" stroke-width="4"/>
+      <rect x="196" y="10" width="78" height="40" rx="10" fill="#d97757" stroke="#23262c" stroke-width="4"/>
+      <path d="M40 18L8 30L40 42Z" fill="#23262c"/><rect x="90" y="24" width="80" height="12" rx="6" fill="#d97757" opacity=".7"/>
+    </g>
+  </svg>
+</div>
+
+<script>
+/* nét tay: đường và vòng có độ run, vòng vẽ quá điểm đầu (thẻ whiteboard).
+   'around #id padX padY' đo chữ thật sau khi font tải xong rồi khoanh quanh nó. */
+document.fonts.ready.then(() => {
+  const rnd = s => () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const curve = p => p.reduce((d, q, i) => {
+    if (!i) return `M${q[0].toFixed(1)} ${q[1].toFixed(1)}`;
+    const a = p[i - 2] || p[i - 1], b = p[i - 1], c = q, e = p[i + 1] || q;
+    return d + `C${(b[0] + (c[0] - a[0]) / 6).toFixed(1)} ${(b[1] + (c[1] - a[1]) / 6).toFixed(1)} ${(c[0] - (e[0] - b[0]) / 6).toFixed(1)} ${(c[1] - (e[1] - b[1]) / 6).toFixed(1)} ${c[0].toFixed(1)} ${c[1].toFixed(1)}`;
+  }, '');
+  document.querySelectorAll('[data-hand]').forEach(el => {
+    let [kind, ...v] = el.dataset.hand.split(' '); const n = v.map(Number);
+    if (kind === 'around') {
+      const t = document.querySelector(v[0]), st = document.querySelector('.sm-stage').getBoundingClientRect(), r = t.getBoundingClientRect();
+      const [px, py, turn, seed] = v.slice(1).map(Number);
+      const k = st.width / 1920;
+      n.splice(0, n.length, (r.left - st.left + r.width / 2) / k, (r.top - st.top + r.height / 2) / k, r.width / 2 / k + px, r.height / 2 / k + py, turn, seed);
+      kind = 'ellipse';
+    }
+    if (kind === 'line') {
+      const [x1, y1, x2, y2] = n, r = rnd(Math.round(x1 + y2)), len = Math.hypot(x2 - x1, y2 - y1), k = Math.max(2, Math.round(len / 80));
+      const nx = -(y2 - y1) / len, ny = (x2 - x1) / len, pts = [];
+      for (let i = 0; i <= k; i++) { const t = i / k, j = (i && i < k) ? (r() - .5) * 5 : 0; pts.push([x1 + (x2 - x1) * t + nx * j, y1 + (y2 - y1) * t + ny * j]); }
+      el.setAttribute('d', curve(pts));
+    } else {
+      const [cx, cy, rx, ry, turn = 1.15, seed = 1] = n, r = rnd(seed * 97), m = Math.round(16 * turn), pts = [];
+      for (let i = 0; i <= m; i++) { const t = i / m, a = -2.3 + t * turn * 2 * Math.PI, g = 1 + t * .07 + (r() - .5) * .03; pts.push([cx + Math.cos(a) * rx * g, cy + Math.sin(a) * ry * g]); }
+      el.setAttribute('d', curve(pts));
+    }
+  });
+});
+</script>
+<script src="../runtime/deck.js"></script>
+</body>
+</html>

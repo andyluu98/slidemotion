@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tên deck</title>
+<!-- Font của style (lấy dòng import trong thẻ style). -->
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* Token của style: chép từ thẻ style, đổi tùy ý. */
+.sm-stage {
+  --bg: #0b1220; --fg: #eef1f6; --muted: #9fb0cc; --accent: #ffc21a;
+  --font-display: 'Be Vietnam Pro', sans-serif; --font-body: 'Be Vietnam Pro', sans-serif;
+  background: var(--bg); color: var(--fg); font-family: var(--font-body);
+}
+/* Từ đây trở xuống: CSS riêng của từng slide. Không có khung dựng sẵn. */
+.s-bia h1 { position: absolute; left: 120px; top: 360px; margin: 0; font: 800 140px/1 var(--font-display); }
+</style>
+</head>
+<body>
+<div class="sm-stage">
+
+  <section class="slide s-bia" data-scene="bia">
+    <h1 data-anim="wipe">Tiêu đề</h1>
+  </section>
+
+</div>
+<!-- Khi giao: chép nội dung runtime/deck.js vào đây thay cho src. -->
+<script src="deck.js"></script>
+</body>
+</html>
