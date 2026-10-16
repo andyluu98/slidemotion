@@ -1,6 +1,6 @@
 ---
 name: slidemotion
-description: Soạn slide HTML có chuyển động kể chuyện từ một chủ đề và nội dung gợi ý, theo thẻ style (85 phong cách) làm cảm hứng chứ không làm khuôn. AI đóng vai đạo diễn, mỗi slide tự thiết kế hình và hiệu ứng đúng ý; xuất được PowerPoint giữ hiệu ứng tương ứng. Dùng khi người dùng muốn làm slide, deck, bài thuyết trình, pitch, slide có hiệu ứng, slide đẹp không rập khuôn, /slidemotion, SlideMotion.
+description: Soạn slide HTML có chuyển động kể chuyện từ một chủ đề và nội dung gợi ý, theo thẻ style (85 phong cách) làm cảm hứng chứ không làm khuôn. AI đóng vai đạo diễn, mỗi slide tự thiết kế hình và hiệu ứng đúng ý. Xuất PowerPoint đang làm (giai đoạn 3), hiện giao file HTML. Dùng khi người dùng muốn làm slide, deck, bài thuyết trình, pitch, slide có hiệu ứng, slide đẹp không rập khuôn, /slidemotion, SlideMotion.
 ---
 
 # SlideMotion: AI làm đạo diễn, không lắp ghép khung
