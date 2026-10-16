@@ -158,6 +158,8 @@ svg [data-anim],svg [data-loop]{transform-box:fill-box;transform-origin:center}
   addEventListener('resize', fit);
   fit();
   window.deck = { go: i => go(i, true), next: nextStep, prev: prevStep, get index() { return cur; }, count: slides.length, stage, slides };
+  // start after the whole page is parsed, so listeners on 'sm:change' in later scripts catch the first slide;
   // setTimeout, not requestAnimationFrame: rAF never fires while the tab is hidden
-  setTimeout(() => cur < 0 && go((parseInt(location.hash.slice(1)) || 1) - 1), 0);
+  const start = () => setTimeout(() => cur < 0 && go((parseInt(location.hash.slice(1)) || 1) - 1), 0);
+  document.readyState === 'loading' ? addEventListener('DOMContentLoaded', start) : start();
 })();
