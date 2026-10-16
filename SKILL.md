@@ -96,6 +96,9 @@ Sửa tới khi qua hết. Không giao khi chưa tự xem.
 - Hình trang trí không liên quan nội dung chạy qua chạy lại.
 - Cả deck một kiểu hiện, một tốc độ.
 - Chữ nằm trong ảnh hoặc SVG nên không sửa được khi sang PowerPoint.
+- `data-anim` gắn lên khối cao 0px (chỉ chứa phần tử `position:absolute`): trình duyệt không chạy chuyển động, khối kẹt ở trạng thái ẩn. Gắn `data-anim` lên chính phần tử có kích thước.
+- Phần tử vừa xoay vừa có `data-anim`: hiệu ứng vào đặt lại `transform` nên mất góc xoay. Xoay bằng thuộc tính riêng `rotate: 30deg` (hoặc bọc thêm một lớp).
+- Tự chụp để soát: Edge hoặc Chrome có sẵn chạy `--headless=new --user-data-dir=<thư mục tạm riêng cho mỗi lần chụp> --window-size=1920,1080 --virtual-time-budget=9000 --screenshot=...`. Dùng chung hồ sơ thì lệnh trả về ngay mà không ghi ảnh, hoặc lấy bản cũ trong bộ nhớ đệm.
 
 ## 5. Chế độ nhanh
 Người dùng nói "nhanh", "ít token" hoặc deck trên 25 slide: dựng 3 đến 4 "cảnh" dùng lại (một cảnh quy trình, một cảnh so sánh, một cảnh con số), thay nội dung; dồn minh họa riêng cho bìa, khoảnh khắc chính và kết.
